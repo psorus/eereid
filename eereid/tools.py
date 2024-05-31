@@ -253,7 +253,11 @@ class anyrank():
             return self.kwargs[N]
         return self.rankN(N)
     def summarize(self):
-        return {f"rank-{i}":self.rankN(i) for i in [1,2,3,5,10]}|self.kwargs
+        dict1 = {f"rank-{i}": self.rankN(i) for i in [1, 2, 3, 5, 10]}
+        dict2 = self.kwargs
+        merged_dict = dict1.copy()
+        merged_dict.update(dict2)
+        return merged_dict
     def __repr__(self):
         return json.dumps(self.summarize(),indent=2)
     def __add__(self,other):
@@ -305,7 +309,11 @@ class statistics():
     def list_additionals(self):
         return [key for key in self.res[0].kwargs.keys()]
     def summarize(self):
-        return {f"rank-{i}":self.inf(i) for i in [1,2,3,5,10]}|{key:self.inf(key) for key in self.list_additionals()}
+        dict1 = {f"rank-{i}": self.inf(i) for i in [1, 2, 3, 5, 10]}
+        dict2 = {key: self.inf(key) for key in self.list_additionals()}
+        merged_dict = dict1.copy()
+        merged_dict.update(dict2)
+        return merged_dict
     def __repr__(self):
         return json.dumps(self.summarize(),indent=2)
 

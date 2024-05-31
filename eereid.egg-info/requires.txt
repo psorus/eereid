@@ -2,3 +2,4 @@ tensorflow
 numpy
 scikit-learn
 tqdm
+pyod

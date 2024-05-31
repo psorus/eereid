@@ -20,18 +20,26 @@ def uqdm(iterable,rounde=4,*args,**kwargs):
 
 
 
-def datasplit(x,y, mods):
+def datasplit(x,y, mods, novelty=False):
     f_train=mods("train_fraction",0.6)
+    f_novel=mods("novel_fraction",0.1)
     f_val=mods("val_fraction",0.5)
     seed=mods("datasplit_seed",42)
+    if novelty==False:
+        f_novel=0.0
     
     classes=list(set(list(y)))
     n_classes=len(classes)
     rnd = np.random.RandomState(seed)
     rnd.shuffle(classes)
 
-    train_cls=classes[:int(f_train*n_classes)]
-    test_cls=classes[int(f_train*n_classes):]
+    n_train=int(f_train*n_classes)
+    n_novel=int(np.ceil(f_novel*n_classes))
+    n_test=n_classes-n_train-n_novel
+
+    train_cls=classes[:n_train]
+    test_cls=classes[n_train:n_train+n_test]
+    novel_cls=classes[n_train+n_test:]
 
     class_to_samples={cls:[] for cls in classes}
     for xx,yy in zip(x,y):
@@ -46,6 +54,13 @@ def datasplit(x,y, mods):
     rnd.shuffle(idx)
     train_x=train_x[idx]
     train_y=train_y[idx]
+
+    if len(novel_cls)>0:
+        novel_x=np.concatenate([class_to_samples[cls] for cls in novel_cls])
+        idx=np.arange(len(novel_x))
+        rnd.shuffle(idx)
+        novel_x=novel_x[idx]
+
 
     val_x,val_y,gal_x,gal_y=[],[],[],[]
     for cls in test_cls:
@@ -73,13 +88,21 @@ def datasplit(x,y, mods):
     val_x=val_x[idx]
     val_y=val_y[idx]
 
-    return train_x,train_y,val_x,val_y,gal_x,gal_y
+    if len(novel_cls)==0:
+        return train_x,train_y,val_x,val_y,gal_x,gal_y
+    else:
+        return train_x,train_y,val_x,val_y,gal_x,gal_y,novel_x
 
-def crossvalidation(x,y, mods):
+def crossvalidation(x,y, mods, novelty=False):
     folds=mods("folds",5)
+    folds_novel=mods("novel_folds",1)
     folds_train=mods("train_folds",3)
     f_val=mods("val_fraction",0.5)
     seed=mods("datasplit_seed",42)
+    if novelty==False:
+        folds_novel=0
+    folds_test=folds-folds_train-folds_novel
+
     
     classes=list(set(list(y)))
     n_classes=len(classes)
@@ -92,9 +115,11 @@ def crossvalidation(x,y, mods):
 
     for i in range(folds):
         train_folds=[(i+j)%folds for j in range(folds_train)]
-        test_folds=[(i+j)%folds for j in range(folds_train,folds)]
+        test_folds=[(i+j+folds_train)%folds for j in range(folds_test)]
+        novel_folds=[(i+j+folds_train+folds_test)%folds for j in range(folds_novel)]
         train_cls=[cls for fold in train_folds for cls in foldcls[fold]]
         test_cls=[cls for fold in test_folds for cls in foldcls[fold]]
+        novel_cls=[cls for fold in novel_folds for cls in foldcls[fold]]
 
         class_to_samples={cls:[] for cls in classes}
         for xx,yy in zip(x,y):
@@ -109,6 +134,12 @@ def crossvalidation(x,y, mods):
         rnd.shuffle(idx)
         train_x=train_x[idx]
         train_y=train_y[idx]
+
+        if novelty:
+            novel_x=np.concatenate([class_to_samples[cls] for cls in novel_cls])
+            idx=np.arange(len(novel_x))
+            rnd.shuffle(idx)
+            novel_x=novel_x[idx]
 
         val_x,val_y,gal_x,gal_y=[],[],[],[]
         for cls in test_cls:
@@ -136,7 +167,10 @@ def crossvalidation(x,y, mods):
         val_x=val_x[idx]
         val_y=val_y[idx]
 
-        yield train_x,train_y,val_x,val_y,gal_x,gal_y
+        if novelty:
+            yield train_x,train_y,val_x,val_y,gal_x,gal_y,novel_x
+        else:
+            yield train_x,train_y,val_x,val_y,gal_x,gal_y
 
 def build_triplets(x,y,mods):
     count=mods("triplet_count",10000)
@@ -209,15 +243,21 @@ def rank1(val_emb,val_y,gal_emb,gal_y, distance):
     return rank1/len(val_emb)
 
 class anyrank():
-    def __init__(self,hits,mAP=None):
+    def __init__(self,hits,**kwargs):
         self.hits=hits
-        self.mAP=mAP
+        self.kwargs=kwargs
     def rankN(self,N):
         return np.mean(self.hits<=N)
     def __call__(self,N):
+        if type(N) is str and N in self.kwargs:
+            return self.kwargs[N]
         return self.rankN(N)
     def summarize(self):
-        return {f"rank-{i}":self.rankN(i) for i in [1,2,3,5,10]}|({"mAP":self.mAP} if self.mAP is not None else {})
+        dict1 = {f"rank-{i}": self.rankN(i) for i in [1, 2, 3, 5, 10]}
+        dict2 = self.kwargs
+        merged_dict = dict1.copy()
+        merged_dict.update(dict2)
+        return merged_dict
     def __repr__(self):
         return json.dumps(self.summarize(),indent=2)
     def __add__(self,other):
@@ -226,6 +266,10 @@ class anyrank():
         else:
             other=statistics(self,other)
         return other
+    def __setitem__(self,key,value):
+        self.kwargs[key]=value
+    def __getitem__(self,key):
+        return self(kwargs[key])
 
 
 class statistics():
@@ -240,12 +284,12 @@ class statistics():
         values=[r(*args) for r in self.res]
         return np.mean(values),np.std(values)/np.sqrt(len(values))
 
-    def mAP(self):
-        return np.mean([r.mAP for r in self.res if r.mAP is not None]),np.std([r.mAP for r in self.res if r.mAP is not None])/np.sqrt(len([r.mAP for r in self.res if r.mAP is not None]))
+    def additional(self,name):
+        return np.mean([r(name) for r in self.res]),np.std([r(name) for r in self.res])/np.sqrt(len(self.res))
 
     def __call__(self,*args):
-        if len(args)>0 and args[0]=="mAP":
-            return self.mAP()
+        if len(args)>0 and type(args[0]) is str:
+            return self.additional(args[0])
         return self.eval(*args)
 
     def __add__(self,other):
@@ -262,24 +306,29 @@ class statistics():
     def inf(self,*args):
         mn,std=self(*args)
         return f"{mn:.4f}+-{std:.4f}"
-
+    def list_additionals(self):
+        return [key for key in self.res[0].kwargs.keys()]
     def summarize(self):
-        return {f"rank-{i}":self.inf(i) for i in [1,2,3,5,10]}|{"mAP":self.inf("mAP")}
+        dict1 = {f"rank-{i}": self.inf(i) for i in [1, 2, 3, 5, 10]}
+        dict2 = {key: self.inf(key) for key in self.list_additionals()}
+        merged_dict = dict1.copy()
+        merged_dict.update(dict2)
+        return merged_dict
     def __repr__(self):
         return json.dumps(self.summarize(),indent=2)
 
-def rankN(val_emb,val_y,gal_emb,gal_y,distance):
-    hits=[]
-    rank1=0
-    for i,func in uqdm(range(len(val_emb))):
-        dist=distance.multi_distance(gal_emb,val_emb[i])#np.linalg.norm(val_emb[i]-gal_emb, axis=1)
-        idx=np.argsort(dist)
-        firsthit=int(np.where(gal_y[idx]==val_y[i])[0][0])
-        if firsthit==0:
-            rank1+=1
-        hits.append(firsthit+1)
-        func(rank1/(i+1))
-    return anyrank(np.array(hits))
+#def rankN(val_emb,val_y,gal_emb,gal_y,distance, novelty=None):
+#    hits=[]
+#    rank1=0
+#    for i,func in uqdm(range(len(val_emb))):
+#        dist=distance.multi_distance(gal_emb,val_emb[i])#np.linalg.norm(val_emb[i]-gal_emb, axis=1)
+#        idx=np.argsort(dist)
+#        firsthit=int(np.where(gal_y[idx]==val_y[i])[0][0])
+#        if firsthit==0:
+#            rank1+=1
+#        hits.append(firsthit+1)
+#        func(rank1/(i+1))
+#    return anyrank(np.array(hits))
 
 def compute_ap(ranks, n_relevant):
     """
@@ -299,7 +348,7 @@ def compute_ap(ranks, n_relevant):
     ap = np.sum(precisions) / n_relevant
     return ap
 
-def rankN(val_emb, val_y, gal_emb, gal_y, distance):
+def rankN(val_emb, val_y, gal_emb, gal_y, distance, novelty=None):
     hits = []
     rank1 = 0
     ap_scores = []
@@ -328,7 +377,7 @@ def rankN(val_emb, val_y, gal_emb, gal_y, distance):
     mAP = np.mean(ap_scores)
     #print(f"Mean Average Precision (mAP): {mAP:.4f}")
 
-    return anyrank(np.array(hits), mAP)
+    return anyrank(np.array(hits), mAP=mAP)
 
 
 
