@@ -15,8 +15,9 @@ setup(
   install_requires=[            
           'tensorflow',
           'numpy',
-          'sklearn',
+          'scikit-learn',
           'tqdm',
+          'pyod'
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',      

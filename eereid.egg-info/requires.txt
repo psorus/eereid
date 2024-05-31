@@ -1,4 +1,4 @@
 tensorflow
 numpy
-sklearn
+scikit-learn
 tqdm

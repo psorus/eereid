@@ -1,4 +1,4 @@
-from plt import *
+from matplotlib import *
 import numpy as np
 
 import tensorflow as tf
