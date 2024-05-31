@@ -40,13 +40,21 @@ from eereid.modifier.repeated import repeated
 
 from eereid.ghost import ensemble
 
-g1=ghost(mnist(),lN(2),extended_triplet(),simple_conv())
-g2=ghost(lN(2),extended_triplet(),simple_conv())
-g1["triplet_count"]=100#0
-g2["triplet_count"]=100#0
+from eereid.novelty.knn import knn
 
-g=g2+g1
+g=ghost(mnist(),lN(2),extended_triplet(),simple_conv())
+#g1=ghost(mnist(),lN(2),extended_triplet(),simple_conv())
+#g2=ghost(lN(2),extended_triplet(),simple_conv())
+#g1["triplet_count"]=100#0
+#g2["triplet_count"]=100#0
+
+#g=g2+g1
 g(subsample(0.1))
+g["triplet_count"]=100
+
+g.set_novelty(knn())
+g["novel_fraction"]=0.1
+
 
 #label=lambda fn: int(fn.split("/")[-1].split("_")[0])
 #include=lambda fn: fn.endswith(".jpg") and not fn.startswith("-1")
@@ -79,10 +87,10 @@ g(subsample(0.1))
 
 #g(contrastive())
 
-#g(crossval())
+g(crossval())
 #g(repeated(2))
 
-g["folds"]=2
+g["folds"]=3
 g["train_folds"]=1
 
 acc=g.evaluate()

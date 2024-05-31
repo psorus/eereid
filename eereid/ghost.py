@@ -8,8 +8,10 @@ from tensorflow import keras
 
 from eereid.modifier.mods import mods
 
+from sklearn.metrics import roc_auc_score
+
 class ghost():
-    def __init__(self,*tags,dataset=None, distance=None, loss=None, model=None, novelty=None, experiments=None,modifier=None,prepros=None, **kwargs):
+    def __init__(self,*tags,dataset=None, distance=None, loss=None, model=None, novelty=None, experiments=None,modifier=None,prepros=None,preprocessing=None, **kwargs):
         #add kwargs 
         self.dataset=None
         self.distance=None
@@ -50,6 +52,12 @@ class ghost():
                     self.add_prepro(prepro)
             else:
                 self.add_prepro(prepros)
+        if preprocessing is not None:
+            if type(preprocessing) is list:
+                for prepro in preprocessing:
+                    self.add_prepro(prepro)
+            else:
+                self.add_prepro(preprocessing)
 
         self.add(kwargs)
 
@@ -140,17 +148,26 @@ class ghost():
         self.x,self.y=self.dataset.load_data(self.mods())
         self.input_shape=list(self.dataset.input_shape())
         self._preprocess()
-        self.tx,self.ty,self.vx,self.vy,self.gx,self.gy=datasplit(self.x,self.y,self.mods())
+        if self.novelty is None:
+            self.tx,self.ty,self.vx,self.vy,self.gx,self.gy=datasplit(self.x,self.y,self.mods(),novelty=False)
+        else:
+            self.tx,self.ty,self.vx,self.vy,self.gx,self.gy,self.nx=datasplit(self.x,self.y,self.mods(),novelty=True)
         self._preprocess_train()
     def _crossval_data_loading(self):
         self.x,self.y=self.dataset.load_data(self.mods())
         self.input_shape=list(self.dataset.input_shape())
         self._preprocess()
         fold=0
-        for self.tx,self.ty,self.vx,self.vy,self.gx,self.gy in crossvalidation(self.x,self.y,self.mods()):
-            self._preprocess_train()
-            yield fold
-            fold+=1
+        if self.novelty is None:
+            for self.tx,self.ty,self.vx,self.vy,self.gx,self.gy in crossvalidation(self.x,self.y,self.mods(),novelty=False):
+                self._preprocess_train()
+                yield fold
+                fold+=1
+        else:
+            for self.tx,self.ty,self.vx,self.vy,self.gx,self.gy,self.nx in crossvalidation(self.x,self.y,self.mods(),novelty=True):
+                self._preprocess_train()
+                yield fold
+                fold+=1
         
     def _create_model(self):
         self.model.build(self.input_shape,self.loss.siamese_count(),self.mods())
@@ -197,6 +214,8 @@ class ghost():
         self.emb =self._embed(self.tx)
         self.vemb=self._embed(self.vx)
         self.gemb=self._embed(self.gx)
+        if self.novelty is not None:
+            self.nemb=self._embed(self.nx)
 
     def _basic_accuracy(self):
         self._create_embeddings()
@@ -204,6 +223,17 @@ class ghost():
         distance=self.distance
 
         acc=rankN(self.vemb,self.vy,self.gemb,self.gy,distance=distance)
+
+        if self.novelty is not None:
+            self.novelty.create_model(self.gemb)
+            normal=self.vemb
+            abnormal=self.nemb
+            test=np.concatenate([normal,abnormal])
+            label=np.concatenate([np.zeros(len(normal)),np.ones(len(abnormal))])
+            acc["auc"]=roc_auc_score(label,self.novelty.predict(test))
+
+        
+
         return acc
 
     def evaluate(self):

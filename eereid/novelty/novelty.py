@@ -1,15 +1,15 @@
-from gag import gag
+from eereid.gag import gag
 
 class novelty(gag):
-    def __init__(self):
-        super().__init__()
+    def __init__(self,name):
+        super().__init__(name)
         self.trained=False
 
     def create_model(self,normal):
         """trains a model to predict novelty"""
         raise NotImplementedError
 
-    def predict(self,normal):
+    def predict(self,samples):
         """predicts novelty of a given input or set of inputs"""
         raise NotImplementedError
 
