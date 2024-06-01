@@ -1,5 +1,9 @@
 from eereid.novelty.pyod_wrapper import pyod_wrapper
-from pyod.models.sod import SOD
+try:
+    from pyod.models.sod import SOD
+except ImportError:
+    from eereid.importhelper import importhelper
+    SOD=importhelper("pyod","sod novelty")
 
 
 class sod(pyod_wrapper):

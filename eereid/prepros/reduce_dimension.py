@@ -1,8 +1,8 @@
 from eereid.prepros.prepro import prepro
 
-import cv2
 import numpy as np
 
+#working atm
 class reduce_dimension(prepro):
     def __init__(self, square_size, delta=None, func="avg"):
         self.size = size

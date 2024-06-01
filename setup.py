@@ -17,7 +17,6 @@ setup(
           'numpy',
           'scikit-learn',
           'tqdm',
-          'pyod'
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',      

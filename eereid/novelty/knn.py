@@ -1,5 +1,9 @@
 from eereid.novelty.pyod_wrapper import pyod_wrapper
-from pyod.models.knn import KNN
+try:
+    from pyod.models.knn import KNN
+except ImportError:
+    from eereid.importhelper import importhelper
+    KNN=importhelper("pyod","knn novelty")
 
 
 class knn(pyod_wrapper):

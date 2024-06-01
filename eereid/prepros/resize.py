@@ -1,6 +1,10 @@
 from eereid.prepros.prepro import prepro
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    from eereid.importhelper import importhelper
+    cv2=importhelper("cv2","resize","pip install opencv-python")
 import numpy as np
 
 class resize(prepro):
