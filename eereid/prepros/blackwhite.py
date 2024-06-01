@@ -27,3 +27,6 @@ class blackwhite(prepro):
     def save(self,pth,index):
         super().save(pth,index,r=self.r,g=self.g,b=self.b)
 
+    def stage(self):return "general"
+    def order(self):return 3
+

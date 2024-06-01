@@ -24,3 +24,5 @@ class flips(prepro):
     def save(self,pth,index):
         super().save(pth,index,seed=self.seed)
 
+    def stage(self):return "train"
+    def order(self):return 2

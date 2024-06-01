@@ -19,3 +19,6 @@ class resize(prepro):
     def save(self,pth,index):
         super().save(pth,index,size=size)
 
+    def stage(self):return "general"
+    def order(self):return 2
+

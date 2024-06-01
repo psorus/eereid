@@ -12,6 +12,8 @@ from sklearn.metrics import roc_auc_score
 
 import eereid as ee
 
+from tqdm import tqdm
+
 class ghost():
     def __init__(self,*tags,dataset=None, distance=None, loss=None, model=None, novelty=None, experiments=None,modifier=None,prepros=None,preprocessing=None, **kwargs):
         #add kwargs 
@@ -136,15 +138,26 @@ class ghost():
         return self.modifier
 
     def _preprocess(self):
-        allowed=["subsample","resize","blackwhite","add_color"]
-        for prepro in allowed:
-            if prepro in self.prepro:
-                self.x,self.y=self.prepro[prepro].apply(self.x,self.y,self)
+        tasks=[prepro for prepro in self.prepro if prepro.stage()=="general"]
+        tasks.sort(key=lambda x:x.order())
+        for task in tasks:
+            self.x,self.y=task.apply(self.x,self.y,self)
+    def apply_preprocessing(self,data, labels=None):
+        x,y=data,labels
+        if y is None:
+            y=np.zeros(len(x))
+        tasks=[prepro for prepro in self.prepro if prepro.stage()=="general"]
+        tasks.sort(key=lambda k:k.order())
+        for prepro in tasks:
+            x,y=prepro.apply(x,y,None)
+        if labels is None:
+            return x
+        return x,y
     def _preprocess_train(self):
-        allowed=["rotations","flips"]
-        for prepro in allowed:
-            if prepro in self.prepro:
-                self.tx,self.ty=self.prepro[prepro].apply(self.tx,self.ty,self)
+        tasks=[prepro for prepro in self.prepro if prepro.stage()=="train"]
+        tasks.sort(key=lambda x:x.order())
+        for task in tasks:
+            self.tx,self.ty=task.apply(self.tx,self.ty,self)
 
     def _basic_data_loading(self):
         self.x,self.y=self.dataset.load_data(self.mods())
@@ -154,6 +167,12 @@ class ghost():
             self.tx,self.ty,self.vx,self.vy,self.gx,self.gy=datasplit(self.x,self.y,self.mods(),novelty=False)
         else:
             self.tx,self.ty,self.vx,self.vy,self.gx,self.gy,self.nx=datasplit(self.x,self.y,self.mods(),novelty=True)
+        self._preprocess_train()
+    def _direct_data_loading(self):
+        self.x,self.y=self.dataset.load_data(self.mods())
+        self.input_shape=list(self.dataset.input_shape())
+        self._preprocess()
+        self.tx,self.ty=self.x,self.y
         self._preprocess_train()
     def _crossval_data_loading(self):
         self.x,self.y=self.dataset.load_data(self.mods())
@@ -227,8 +246,15 @@ class ghost():
                 ret[pos]=getattr(self,pos)
         return ret
 
-    def load_model(self,pth):
+    def load_model(self,pth=None):
+        if pth is None:
+            pth=self.mods()("model_file","eereid_model")
         self.set_model(ee.models.load_model(pth))
+
+    def save_model(self,pth=None):
+        if pth is None:
+            pth=self.mods()("model_file","eereid_model")
+        self.model.save_model(pth)
 
     def save_data(self,pth):
         np.savez_compressed(pth,**self._all_available_data())
@@ -271,6 +297,47 @@ class ghost():
         acc=self._basic_accuracy()
 
         return acc
+
+    def train(self):
+        self._direct_data_loading()
+        if self.mods().hasattr("pretrain"):
+            self._pretrain_prediction()
+        self._train_model()
+
+    def assert_trained(self):
+        if self.mods().hasattr("model_file") and os.path.exists(self.mods()("model_file")):
+            self.load_model()
+        if self.model.trained==False:
+            self.train()
+
+    def embed(self,data):
+        self.assert_trained()
+        data=self.apply_preprocessing(data)
+        return self.model.embed(data)
+
+    def clear_gallery(self):
+        self.gemb=[]
+        self.gx=[]
+        self.gy=[]
+
+    def add_to_gallery(self,data,labels):
+        self.assert_trained()
+        data,labels=self.apply_preprocessing(data,labels)
+        self.gemb=np.concatenate([self.gemb,self.embed(data)],axis=0)
+        self.gx=np.concatenate([self.gx,data],axis=0)
+        self.gy=np.concatenate([self.gy,labels],axis=0)
+
+    def predict(self,data):
+        emb=self.embed(data)
+        ret=[]
+        for e in tqdm(emb):
+            dist=self.distance.multi_distance(self.gemb,e)
+            ret.append(self.gy[np.argmin(dist)])
+        return np.array(ret)
+
+
+
+
 
     def _repeated_eval(self,n):
         if type(n) is bool:
@@ -328,8 +395,6 @@ class ghost():
             return other.add_objs(self)
         return ensemble(self,other)
 
-    def save_model(self,path):
-        self.model.save_model(path)
 
 
 class ensemble(ghost):

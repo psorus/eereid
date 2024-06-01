@@ -14,9 +14,10 @@ class load_model(wrapmodel):
 
     def build_submodel(self,input_shape, mods):
         self.submodel=keras.models.load_model(self.pth)
+        self.trained=True
 
     def fit(self,triplets,*args,**kwargs):
-        pass
+        self.trained=True
 
 
 

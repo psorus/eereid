@@ -5,6 +5,7 @@ class model(gag):
         super().__init__(name)
         self.model=None
         self.submodel=None
+        self.trained=False
 
     def build(self,input_shape, siamese_count, mods):
         raise NotImplementedError
@@ -24,7 +25,9 @@ class model(gag):
         self.model.summary()
 
     def fit(self,triplets,*args,**kwargs):
-        return self.model.fit(triplets,triplets,*args,**kwargs)
+        ret= self.model.fit(triplets,triplets,*args,**kwargs)
+        self.trained=True
+        return ret
 
     def embed(self,data):
         return self.submodel.predict(data)
