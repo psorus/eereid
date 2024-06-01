@@ -28,3 +28,6 @@ class model(gag):
 
     def embed(self,data):
         return self.submodel.predict(data)
+
+    def save_model(self,pth):
+        self.submodel.save(pth)

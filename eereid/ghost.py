@@ -10,6 +10,8 @@ from eereid.modifier.mods import mods
 
 from sklearn.metrics import roc_auc_score
 
+import eereid as ee
+
 class ghost():
     def __init__(self,*tags,dataset=None, distance=None, loss=None, model=None, novelty=None, experiments=None,modifier=None,prepros=None,preprocessing=None, **kwargs):
         #add kwargs 
@@ -217,6 +219,23 @@ class ghost():
         if self.novelty is not None:
             self.nemb=self._embed(self.nx)
 
+    def _all_available_data(self):
+        ret={}
+        poss=["x","y","tx","ty","vx","vy","gx","gy","nx","emb","vemb","gemb","nemb","input_shape"]
+        for pos in poss:
+            if hasattr(self,pos):
+                ret[pos]=getattr(self,pos)
+        return ret
+
+    def load_model(self,pth):
+        self.set_model(ee.models.load_model(pth))
+
+    def save_data(self,pth):
+        np.savez_compressed(pth,**self._all_available_data())
+
+    def load_data(self,pth):
+        self.set_dataset(ee.datasets.load_data(pth))
+
     def _basic_accuracy(self):
         self._create_embeddings()
 
@@ -308,6 +327,9 @@ class ghost():
         if type(self) is not ensemble and type(other) is ensemble:
             return other.add_objs(self)
         return ensemble(self,other)
+
+    def save_model(self,path):
+        self.model.save_model(path)
 
 
 class ensemble(ghost):
