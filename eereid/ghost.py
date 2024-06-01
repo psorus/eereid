@@ -17,11 +17,11 @@ from tqdm import tqdm
 class ghost():
     def __init__(self,*tags,dataset=None, distance=None, loss=None, model=None, novelty=None, experiments=None,modifier=None,prepros=None,preprocessing=None, **kwargs):
         #add kwargs 
-        self.dataset=None
-        self.distance=None
+        self.dataset=ee.datasets.mnist()
+        self.distance=ee.distances.euclidean()
         self.experiments={}
-        self.loss=None
-        self.model=None
+        self.loss=ee.losses.triplet()
+        self.model=ee.models.conv()
         self.modifier=mods()
         self.novelty=None
         self.prepro={}
@@ -303,6 +303,8 @@ class ghost():
         if self.mods().hasattr("pretrain"):
             self._pretrain_prediction()
         self._train_model()
+        if seld.mods().hasattr("model_file"):
+            self.save_model()
 
     def assert_trained(self):
         if self.mods().hasattr("model_file") and os.path.exists(self.mods()("model_file")):
