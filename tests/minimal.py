@@ -1,6 +1,4 @@
 import eereid as ee
 
-g=ee.ghost()
-
-print(g.evaluate())
+print(ee.ghost(ee.prepros.subsample(0.1),triplet_count=100).evaluate())
 
