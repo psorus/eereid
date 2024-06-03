@@ -18,7 +18,7 @@ class wrapmodel(model):
         self.build_submodel(input_shape,mods)
 
         inp2=keras.layers.Input(shape=[siamese_count]+list(input_shape))
-        samples=[inp2[i] for i in range(siamese_count)]
+        samples=[inp2[:,i] for i in range(siamese_count)]
         samples=[self.submodel(sample) for sample in samples]
         samples=[K.expand_dims(sample,axis=0) for sample in samples]
         outp=K.concatenate(samples,axis=0)

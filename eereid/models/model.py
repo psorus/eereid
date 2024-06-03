@@ -24,8 +24,8 @@ class model(gag):
         print("model:")
         self.model.summary()
 
-    def fit(self,triplets,*args,**kwargs):
-        ret= self.model.fit(triplets,triplets,*args,**kwargs)
+    def fit(self,triplets,labels,*args,**kwargs):
+        ret= self.model.fit(triplets,labels,*args,**kwargs)
         self.trained=True
         return ret
 

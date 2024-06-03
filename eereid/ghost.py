@@ -223,9 +223,15 @@ class ghost():
         loss=self.loss.build(self.mods())
         self.model.compile(loss=loss,optimizer=optimizer)
 
-        Nlets=build_Nlets(self.tx,self.ty,self.loss.Nlet_string(),self.mods())
+        Nlets, labels=build_Nlets(self.tx,self.ty,self.loss.Nlet_string(),self.mods())
 
-        self.model.fit(Nlets,epochs=epochs,batch_size=batch_size)
+        #print(Nlets.shape,labels.shape)
+        #print(self.model.model.input_shape, self.model.model.output_shape)
+        #print(self.model.submodel.input_shape, self.model.submodel.output_shape)
+
+        #exit()
+
+        self.model.fit(Nlets,labels,epochs=epochs,batch_size=batch_size)
 
     def _embed(self,data):
         #embedding but no preprocess

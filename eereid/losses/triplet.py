@@ -12,6 +12,8 @@ class triplet(loss):
     def build(self,mods):
 
         def func(y_true, y_pred):
+            #print(y_true.shape,y_pred.shape)
+            #exit()
             anchor, positive, negative = y_pred[0], y_pred[1], y_pred[2]
             positive_dist = K.sum(K.square(anchor - positive), axis=-1)
             negative_dist = K.sum(K.square(anchor - negative), axis=-1)

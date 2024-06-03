@@ -202,8 +202,9 @@ def _choose_one(lis):
     dex=np.random.choice(len(lis))
     return lis[dex]
 
-def build_Nlets(x,y,generator,mods):
+def _build_Nlets(x,y,generator,mods,count_multiplier=1.0):
     count=mods("Nlet_count",mods("triplet_count",10000))
+    count=int(count*count_multiplier)
     generator=[gen for gen in generator]
     N=len(generator)
     types=list(set(generator))
@@ -228,6 +229,15 @@ def build_Nlets(x,y,generator,mods):
         Nlets.append(objs)
     
     return np.array(Nlets)
+
+def build_Nlets(x,y,generator,mods):
+    subg=generator.split("/")
+    parts=[_build_Nlets(x,y,sub,mods,1/len(subg)) for sub in subg]
+    ys=np.concatenate([np.repeat(i,len(part)) for i,part in enumerate(parts)])
+    xs=np.concatenate(parts,axis=0)
+    ys=ys.astype(np.float32)
+    return xs,ys
+
 
 
 
