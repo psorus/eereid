@@ -395,17 +395,17 @@ class ghost():
         plt.colorbar()
 
     def __add__(self,other):
-        if type(self) is ensemble and type(other) is ensemble:
-            return ensemble(*self.objs,*other.objs)
-        if type(self) is ensemble and type(other) is not ensemble:
+        if type(self) is haunting and type(other) is haunting:
+            return haunting(*self.objs,*other.objs)
+        if type(self) is haunting and type(other) is not haunting:
             return self.add_objs(other)
-        if type(self) is not ensemble and type(other) is ensemble:
+        if type(self) is not haunting and type(other) is haunting:
             return other.add_objs(self)
-        return ensemble(self,other)
+        return haunting(self,other)
 
 
 
-class ensemble(ghost):
+class haunting(ghost):
     def __init__(self,*objs):
         self.objs=list(objs)
         super().__init__()
@@ -468,13 +468,13 @@ class ensemble(ghost):
         self.gemb=np.concatenate([obj._embed(obj.gx) for obj in self.objs],axis=1)
 
     def __add__(self,other):
-        if type(self) is ensemble and type(other) is ensemble:
-            return ensemble(*self.objs,*other.objs)
-        if type(self) is ensemble and type(other) is not ensemble:
+        if type(self) is haunting and type(other) is haunting:
+            return haunting(*self.objs,*other.objs)
+        if type(self) is haunting and type(other) is not haunting:
             return self.add_objs(other)
-        if type(self) is not ensemble and type(other) is ensemble:
+        if type(self) is not haunting and type(other) is haunting:
             return other.add_objs(self)
-        return ensemble(self,other)
+        return haunting(self,other)
 
 
 
