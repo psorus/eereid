@@ -20,3 +20,4 @@ class loss(gag):
         if "/" in nl:
             nl=nl.split("/")[0]
         return len(nl)
+
