@@ -1,4 +1,4 @@
-from .ghost import ghost, ensemble
+from .ghost import ghost, haunting
 import eereid.datasets
 import eereid.datasets as ds
 import eereid.distances

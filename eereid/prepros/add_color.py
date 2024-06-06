@@ -6,6 +6,7 @@ class add_color(prepro):
         super().__init__("add_color")
 
     def apply(self, data, labels, eereid):
+        self._apply_special(eereid)
         data=np.expand_dims(data,axis=-1)
         data=np.repeat(data,3,axis=-1)
         return data, labels

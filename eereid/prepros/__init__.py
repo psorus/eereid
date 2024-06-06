@@ -6,3 +6,4 @@ from .prepro import prepro
 from .resize import resize
 from .rotations import rotations
 from .subsample import subsample
+from .grapho import grapho
