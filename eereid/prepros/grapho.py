@@ -10,7 +10,12 @@ class grapho(prepro):
     def __init__(self,nodes=50,func=None,subimagesize=2, consider_count=250, connections=3):
         self.nodes=nodes
         if func is None:
-            def func(x):return np.mean(np.abs(x))
+            def func(x):
+                x=np.array(x)
+                x=np.abs(x)
+                while len(x.shape)>1:
+                    x=np.mean(x,axis=-1)
+                return x
         self.func=func
         self.subimagesize=subimagesize
         self.consider_count=consider_count
@@ -29,15 +34,14 @@ class grapho(prepro):
         #first iterate over all subimages and evaluate func. Find the highest consider_count subimages and their position
 
         positions=[]
-        values=[]
+        subimages=[]
         for i in range(image.shape[0]-self.subimagesize):
             for j in range(image.shape[1]-self.subimagesize):
                 subimage=image[i:i+self.subimagesize,j:j+self.subimagesize]
-                value=self.func(subimage)
-                values.append(value)
+                subimages.append(subimage)
                 positions.append((i+self.subimagesize/2,j+self.subimagesize/2))
 
-        values=np.array(values)
+        values=self.func(subimages)
         border=np.sort(values)[-self.consider_count]
         positions=np.array(positions)[values>border]
         values=values[values>border]
