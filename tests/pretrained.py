@@ -21,7 +21,7 @@ base_model = MobileNetV2(weights='imagenet', include_top=False)
 
 # Add a global average pooling layer
 x = base_model.output
-x = GlobalAveragePooling2D()(x)
+#x = GlobalAveragePooling2D()(x)
 
 # Add a fully connected dense layer with, for example, 1024 units
 x = Dense(1024, activation='relu')(x)
