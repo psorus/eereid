@@ -9,8 +9,8 @@ class apply_func(prepro):
     def __init__(self, func=None, subimagesize=4, overlap=0.5):
         if func is None:
             def func(x):
-                while len(x.shape)>1:
-                    x=np.mean(x,axis=-1)
+                x=np.mean(x,axis=1)
+                x=np.mean(x,axis=1)
                 return x
         self.func = func
         self.subimagesize = subimagesize
@@ -38,7 +38,7 @@ class apply_func(prepro):
                 subimages.append(image[i:i+self.subimagesize,j:j+self.subimagesize])
         subimages=np.array(subimages)
         values=self.func(subimages)
-        newimage=np.reshape(values,(dim1,dim2))
+        newimage=np.reshape(values,(dim1,dim2,-1))
         return newimage
 
     def _apply_special(self,eereid):
