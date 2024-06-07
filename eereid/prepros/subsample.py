@@ -24,5 +24,5 @@ class subsample(prepro):
         super().save(pth,index,frac=self.frac,seed=self.seed)
 
     def stage(self):return "general"
-    def order(self):return 1
+    def order(self):return 0
 

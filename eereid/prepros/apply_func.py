@@ -2,10 +2,12 @@ from eereid.prepros.prepro import prepro
 
 import numpy as np
 
+from tqdm import tqdm
+
 class apply_func(prepro):
     #applies a function, to each part of the image, and stiches the resulting values back together
     def __init__(self, func=None, subimagesize=4, overlap=0.5):
-        if self.func is None:
+        if func is None:
             def func(x):
                 while len(x.shape)>1:
                     x=np.mean(x,axis=-1)
@@ -27,10 +29,12 @@ class apply_func(prepro):
     def _apply_one(self, image):#working on
         delta=int(self.subimagesize*(1-self.overlap))
         subimages=[]
+        dim1=0
         for i in range(0,image.shape[0]-self.subimagesize,delta):
-            dim1=i+1
+            dim1+=1
+            dim2=0
             for j in range(0,image.shape[1]-self.subimagesize,delta):
-                dim2=j+1
+                dim2+=1
                 subimages.append(image[i:i+self.subimagesize,j:j+self.subimagesize])
         subimages=np.array(subimages)
         values=self.func(subimages)
@@ -44,5 +48,5 @@ class apply_func(prepro):
         super().save(pth,index,size=size)
 
     def stage(self):return "general"
-    def order(self):return 2
+    def order(self):return 1
 

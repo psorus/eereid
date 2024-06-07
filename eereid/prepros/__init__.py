@@ -1,4 +1,5 @@
 from .add_color import add_color
+from .apply_func import apply_func
 from .blackwhite import blackwhite
 from .flips import flips
 from .prepro import prepro
