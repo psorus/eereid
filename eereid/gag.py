@@ -25,10 +25,5 @@ class gag(object):
     def explain(self):
         return "This is a generic GAG object, specifing some part of a reid model"
 
-    def _add_tags(self, x):
-        lines=x.split('\n')
-        lines=[f"    {line}" for line in lines]
-        return '\n'.join(lines)
-
 
 

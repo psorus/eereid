@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from eereid.tools import datasplit, build_triplets, build_Nlets, rankN, crossvalidation
+from eereid.tools import datasplit, build_triplets, build_Nlets, rankN, crossvalidation, add_tags, various_tags
 
 import tensorflow as tf
 from tensorflow import keras
@@ -64,6 +64,29 @@ class ghost():
                 self.add_prepro(preprocessing)
 
         self.add(kwargs)
+
+    def explain(self):
+        data=[["Ghost ReID experiment",0],
+              ["Dataset:",1],
+              [self.dataset.explain(),2],
+              ["Model:",1],
+              [self.model.explain(),2],
+              ["Loss:",1],
+              [self.loss.explain(),2],
+              ["Distance:",1],
+              [self.distance.explain(),2],
+              ["Preprocessings:",1]]
+        for prepro in self.prepro.values():
+            data.append([prepro.explain(),2])
+        if not self.novelty is None:
+            data.append(["Novelty Detection:",1])
+            data.append([self.novelty.explain(),2])
+        data.append(["Modifiers:",1])
+        data.append([self.mods().explain(),2])
+
+
+        return various_tags(data)
+
 
 
     def add(self,tag):
@@ -475,6 +498,18 @@ class haunting(ghost):
         if type(self) is not haunting and type(other) is haunting:
             return other.add_objs(self)
         return haunting(self,other)
+
+    def explain(self):
+        ret=[[f"Haunting (Ensemble ghost) experiment, build from {len(self.objs)} ghosts.",0],
+             ["Dataset:",1],
+             [self.dataset.explain(),2],
+             ["Distance:",1],
+             [self.distance.explain(),2]]
+        for i,obj in enumerate(self.objs):
+            ret.append([f"Submodel {i+1}:",1])
+            ret.append([obj.explain(),2])
+        return various_tags(ret)
+
 
 
 

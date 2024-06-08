@@ -389,6 +389,17 @@ def rankN(que_emb, que_y, gal_emb, gal_y, distance, novelty=None):
 
     return anyrank(np.array(hits), mAP=mAP)
 
+def add_tags(x, count=1):
+    add="".join(["  "]*count)
+    lines=x.split('\n')
+    lines=[f"{add}{line}" for line in lines]
+    return '\n'.join(lines)
+
+def various_tags(inf):
+    ret=[]
+    for xx,tt in inf:
+        ret.append(add_tags(xx,tt))
+    return '\n'.join(ret)
 
 
 

@@ -120,4 +120,4 @@ class grapho(prepro):
     def order(self):return 10
 
     def explain(self):
-        return f"Converts an image into a graph, by searching for for significant parts. The resulting graph will have {self.nodes}."
+        return f"Converts an image into a graph, by searching for for significant parts. The resulting graph will have {self.nodes} nodes."

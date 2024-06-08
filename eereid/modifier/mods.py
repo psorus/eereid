@@ -33,5 +33,10 @@ class mods(object):
         self.dic[key]=value
 
     def explain(self):
-        return "Modifier:"+"\n".join([f"    {k}: {v.explain()}" for k,v in self.dic.items()])
+        def subexplain(q):
+            if hasattr(q,"explain"):
+                return q.explain()
+            return str(q)
+
+        return "Modifier:"+"\n".join([f"    {k}: {subexplain(v)}" for k,v in self.dic.items()])
 
