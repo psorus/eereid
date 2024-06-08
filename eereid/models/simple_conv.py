@@ -35,6 +35,8 @@ class simple_conv(wrapmodel):
 
         self.submodel=keras.models.Model(inputs=inp,outputs=q)
 
+    def explain(self):
+        return "Creating a simple convolutional neural network model."
 
 
 

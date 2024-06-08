@@ -8,6 +8,9 @@ class repeated(modifier):
     def save(self,pth,index):
         super().save(pth,index,n=self.n)
 
+    def explain(self):
+        return "Enabling repeated evaluation with {} repetitions".format(self.n)
+
 
 
 

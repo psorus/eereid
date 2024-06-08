@@ -13,5 +13,8 @@ class manhattan(distance):
     def multi_distance(self,A,b):
         return np.linalg.norm(A-b, ord=1, axis=1)
 
+    def explain(self):
+        return "Manhattan distance is a measure of distance between two vectors. It is calculated as the sum of the absolute differences between the two vectors. The formula is: sum(abs(a-b))"
+
 
 

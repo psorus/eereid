@@ -38,3 +38,6 @@ class extended_triplet(loss):
     def Nlet_string(self):
         return "aab"
 
+    def explain(self):
+        return "Extended triplet loss with margin of "+str(self.margin)+". The formula is relu(D(a,p)-loss_aggregator(D(a,n),D(p,n))+margin)."
+

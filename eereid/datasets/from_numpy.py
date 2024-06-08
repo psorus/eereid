@@ -17,5 +17,7 @@ class from_numpy(dataset):
     def sample_count(self):
         return len(self.x)
 
+    def explain(self):return "Data loaded from numpy arrays"
+
 
 

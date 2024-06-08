@@ -24,6 +24,9 @@ class wrapmodel(model):
         outp=K.concatenate(samples,axis=0)
         self.model=keras.models.Model(inputs=inp2,outputs=outp)
 
+    def explain(self):
+        return "Inheritable generic class creating siamese neural network wrapper"
+
 
 
 

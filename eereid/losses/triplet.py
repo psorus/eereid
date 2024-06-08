@@ -26,5 +26,8 @@ class triplet(loss):
 
     def Nlet_string(self):
         return "aab"
+
+    def explain(self):
+        return "Triplet loss with margin of "+str(self.margin)+". The formula is relu(D(a,p)-D(a,n)+margin)."
         
 

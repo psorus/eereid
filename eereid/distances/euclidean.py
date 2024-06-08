@@ -13,5 +13,7 @@ class euclidean(distance):
     def multi_distance(self,A,b):
         return np.linalg.norm(A-b, ord=2, axis=1)
 
+    def explain(self):
+        return "Euclidean distance is a measure of distance between two vectors. It is calculated as the square root of the sum of the squared differences between the two vectors. The formula is: sqrt(sum((a-b)^2))"
 
 

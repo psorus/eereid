@@ -42,6 +42,9 @@ class modelzoo(wrapmodel):
 
         self.submodel = Model(inputs=base_model.input, outputs=predictions)
 
+    def explain(self):
+        return f"Modelzoo loader gag, using the base model {self.zoomodel.__name__}." + ("Freezing the pretrained weights." if self.freeze else "")
+
 
 
 

@@ -28,5 +28,8 @@ class contrastive(loss):
     def Nlet_string(self):
         #usual contrastive would only use aa/ab, but this requires a y value. So for consistency we absorb both terms into one aab loss function
         return "aa/ab"
+
+    def explain(self):
+        return "Contrastive loss with margin of "+str(self.margin)+". The formula is 1/2 D**2 for same class pairs and 1/2 max(0,margin-D)**2 for different class pairs."
         
 

@@ -44,6 +44,8 @@ class dataset(gag):
             return other.add_dataset(self)
         return mergeds(self,other)
 
+    def explain(self):return "Generic data loader gag"
+
 class mergeds(dataset):
     def __init__(self,*datasets,seed=42):
         super().__init__("mergeds")
@@ -76,6 +78,10 @@ class mergeds(dataset):
 
     def save(self,pth,index):
         raise NotImplementedError
+
+    def explain(self):
+        return "Combination of multiple datasets:\n"+\
+            "\n".join(["    "+d.explain() for d in self.datasets])
 
 
 

@@ -56,5 +56,7 @@ class downloadable(dataset):
     def sample_count(self):
         return len(self.load_raw()[0])
 
+    def explain(self):return "Generic data downloader gag"
+
 
 

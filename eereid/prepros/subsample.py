@@ -26,3 +26,5 @@ class subsample(prepro):
     def stage(self):return "general"
     def order(self):return 0
 
+    def explain(self):
+        return f"Reduces the fraction of samples used by factor {self.frac}. This is mostly useful for quickly debugging"

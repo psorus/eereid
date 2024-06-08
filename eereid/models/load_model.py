@@ -19,6 +19,9 @@ class load_model(wrapmodel):
     def fit(self,triplets,*args,**kwargs):
         self.trained=True
 
+    def explain(self):
+        return f"Model loaded from {self.pth}"
+
 
 
 

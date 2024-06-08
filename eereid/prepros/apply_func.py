@@ -50,3 +50,6 @@ class apply_func(prepro):
     def stage(self):return "general"
     def order(self):return 1
 
+    def explain(self):
+        return f"Applies a function to each subimage and stiches the result back into a new image. Uses subimages of {self.subimagesize} pixels in each direction with overlap of {self.overlap}"
+

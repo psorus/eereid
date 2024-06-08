@@ -16,3 +16,6 @@ class modifier(gag):
 
     def additional(self):
         return {}
+
+    def explain(self):
+        return "Generic modifier with label {} and value {}".format(self.label,self.value)

@@ -34,3 +34,6 @@ class model(gag):
 
     def save_model(self,pth):
         self.submodel.save(pth)
+
+    def explain(self):
+        return "Generic model gag"

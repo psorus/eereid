@@ -23,5 +23,7 @@ class load_data(dataset):
     def sample_count(self):
         return len(self.load_raw()[0])
 
+    def explain(self):return f"Data loaded from numpy file {self.pth}"
+
 
 

@@ -18,3 +18,5 @@ class distance(gag):
 
     def species(self):return "distance"
 
+    def explain(self):
+        return "Generic distance function gag"

@@ -26,3 +26,5 @@ class resize(prepro):
     def stage(self):return "general"
     def order(self):return 2
 
+    def explain(self):
+        return f"Resizing each image to a size of {self.size}"

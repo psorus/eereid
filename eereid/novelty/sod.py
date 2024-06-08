@@ -16,6 +16,9 @@ class sod(pyod_wrapper):
     def init_model(self):
         self.model = SOD(*self.args, **self.kwargs)
 
+    def explain(self):
+        return f"Enabling Novelty Detection with a SOD model ({self.args}, {self.kwargs})"
+
 
 
 

@@ -16,6 +16,9 @@ class knn(pyod_wrapper):
     def init_model(self):
         self.model = KNN(*self.args, **self.kwargs)
 
+    def explain(self):
+        return f"Enabling Novelty Detection with a KNN model ({self.args}, {self.kwargs})"
+
 
 
 

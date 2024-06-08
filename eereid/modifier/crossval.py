@@ -14,6 +14,9 @@ class crossval(modifier):
         else:
             return {"folds":self.folds}
 
+    def explain(self):
+        return "Enabling cross-validation evaluation with {} folds".format(self.folds)
+
 
 
 

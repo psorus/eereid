@@ -17,3 +17,6 @@ class novelty(gag):
         self.savehelper(pth,"novelty.json",**kwargs)
 
     def species(self):return "novelty"
+
+    def explain(self):
+        return "Generic Novelty Detection gag"

@@ -15,5 +15,7 @@ class mahalanobis(distance):
         inv_cov = np.linalg.inv(cov)
         return np.sqrt(np.diag(np.dot(np.dot((A-b),inv_cov),(A-b).T)))
 
+    def explain(self):
+        return "Mahalanobis distance is a measure of distance between two vectors. It is calculated as the square root of the sum of the squared differences between the two vectors, where the differences are scaled by the inverse of the covariance matrix. The formula is: sqrt((a-b)*inv(cov)*(a-b)^T)"
 
 

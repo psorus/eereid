@@ -64,5 +64,8 @@ class from_folder(dataset):
     def save(self,pth):
         super().save(pth,pth=self.pth,label=self.label,include=self.include)
 
+    def explain(self):
+        return f"Loading images from {self.pth}"
+
 
 

@@ -32,4 +32,6 @@ class mods(object):
     def __setitem__(self, key, value):
         self.dic[key]=value
 
+    def explain(self):
+        return "Modifier:"+"\n".join([f"    {k}: {v.explain()}" for k,v in self.dic.items()])
 

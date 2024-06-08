@@ -99,6 +99,8 @@ class simple_graph(model):
         outp=K.concatenate(samples,axis=0)
         self.model=keras.models.Model(inputs=(inpA,inpX),outputs=outp)
 
+    def explain(self):
+        return "Creating a simple graph neural network model."
 
 
 

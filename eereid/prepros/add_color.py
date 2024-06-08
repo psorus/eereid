@@ -25,3 +25,6 @@ class add_color(prepro):
     def stage(self):return "general"
     def order(self):return 4
 
+    def explain(self):
+        return "Preprocessing that adds a color channel to the data by repeating every value 3 times. This is useful when the model expects a 3-channel input, but the data is grayscale."
+

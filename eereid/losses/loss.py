@@ -21,3 +21,6 @@ class loss(gag):
             nl=nl.split("/")[0]
         return len(nl)
 
+    def explain(self):
+        return "Generic loss function gag."
+

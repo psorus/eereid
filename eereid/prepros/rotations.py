@@ -26,3 +26,5 @@ class rotations(prepro):
     def stage(self):return "train"
     def order(self):return 1
 
+    def explain(self):
+        return "Adds additional training images by rotating each training images. Quadruples the number of training images."

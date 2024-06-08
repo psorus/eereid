@@ -32,3 +32,5 @@ class prepro(gag):
     def order(self):
         return 0.0
 
+    def explain(self):
+        return "Generic preprocessing gag"

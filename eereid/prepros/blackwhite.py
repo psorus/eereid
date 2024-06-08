@@ -30,3 +30,6 @@ class blackwhite(prepro):
     def stage(self):return "general"
     def order(self):return 3
 
+    def explain(self):
+        return f"Converts a 3 channel color image into a grey-scale one. Uses multipliers of R={self.r}, G={self.g} and B={self.b}."
+
