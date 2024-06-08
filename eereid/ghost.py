@@ -299,6 +299,7 @@ class ghost():
         acc=rankN(self.qemb,self.qy,self.gemb,self.gy,distance=distance)
 
         if self.novelty is not None:
+            self.novelty.inherit_info(self)
             self.novelty.create_model(self.gemb)
             normal=self.qemb
             abnormal=self.nemb

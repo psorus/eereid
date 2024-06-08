@@ -5,6 +5,9 @@ class novelty(gag):
         super().__init__(name)
         self.trained=False
 
+    def inherit_info(self, ghost):
+        pass
+
     def create_model(self,normal):
         """trains a model to predict novelty"""
         raise NotImplementedError
