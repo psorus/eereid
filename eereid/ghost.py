@@ -25,6 +25,9 @@ class ghost():
         self.modifier=mods()
         self.novelty=None
         self.prepro={}
+
+        self.logs=None
+
         for tag in tags:
             self.add(tag)
 
@@ -254,7 +257,8 @@ class ghost():
 
         #exit()
 
-        self.model.fit(Nlets,labels,epochs=epochs,batch_size=batch_size)
+        self.logs=self.model.fit(Nlets,labels,epochs=epochs,batch_size=batch_size)
+        return self.logs
 
     def _embed(self,data):
         #embedding but no preprocess
@@ -399,7 +403,7 @@ class ghost():
         return accs
 
 
-    def plot_embeddings(self):
+    def plot_embeddings(self,alpha=1.0):
         from sklearn.decomposition import PCA
 
         pca=PCA(n_components=2)
@@ -407,16 +411,51 @@ class ghost():
         qemb=pca.transform(self.qemb)
         gemb=pca.transform(self.gemb)
 
+        classes=list(set(self.y))
+        vmin,vmax=min(classes),max(classes)
+
+        mn=np.min([np.min(emb,axis=0),np.min(qemb,axis=0),np.min(gemb,axis=0)],axis=0)
+        mx=np.max([np.max(emb,axis=0),np.max(qemb,axis=0),np.max(gemb,axis=0)],axis=0)
+
+
         plt.subplot(1,2,1)
 
-        plt.scatter(emb[:,0],emb[:,1],c=self.ty,alpha=0.5)
+        plt.scatter(emb[:,0],emb[:,1],c=self.ty,alpha=alpha,vmin=vmin,vmax=vmax)
+        plt.xlim(mn[0],mx[0])
+        plt.ylim(mn[1],mx[1])
+        plt.xticks([])
+        plt.yticks([])
+        plt.title("Training")
+        plt.xlabel("Principal Component")
+        plt.ylabel("Principal Component")
         plt.colorbar()
 
         plt.subplot(1,2,2)
-        plt.scatter(qemb[:,0],qemb[:,1],c=self.qy,alpha=0.5)
-        plt.scatter(gemb[:,0],gemb[:,1],c=self.gy,alpha=0.5)
+        plt.scatter(qemb[:,0],qemb[:,1],c=self.qy,alpha=alpha,vmin=vmin,vmax=vmax)
+        plt.scatter(gemb[:,0],gemb[:,1],c=self.gy,alpha=alpha,vmin=vmin,vmax=vmax)
+        plt.xlim(mn[0],mx[0])
+        plt.ylim(mn[1],mx[1])
+        plt.xticks([])
+        plt.yticks([])
+        plt.title("Query + Gallery")
+        plt.xlabel("Principal Component")
 
         plt.colorbar()
+
+    def plot_loss(self,log=False):
+        assert self.logs is not None
+        h=self.logs.history
+        for key,y in h.items():
+            x=np.arange(1,len(y)+1)
+
+            plt.plot(x,y,label=key)
+        plt.legend()
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        if log:
+            plt.yscale("log")
+        plt.legend(frameon=True,framealpha=0.8)
+
 
     def __add__(self,other):
         if type(self) is haunting and type(other) is haunting:
