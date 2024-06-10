@@ -279,7 +279,7 @@ class anyrank():
     def __setitem__(self,key,value):
         self.kwargs[key]=value
     def __getitem__(self,key):
-        return self(kwargs[key])
+        return self.kwargs[key]
 
 
 class statistics():

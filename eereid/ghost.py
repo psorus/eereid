@@ -68,6 +68,9 @@ class ghost():
 
         self.add(kwargs)
 
+    def _log(self,msg,importance=1):
+        self.mods().log(msg,importance)
+
     def explain(self):
         data=[["Ghost ReID experiment",0],
               ["Dataset:",1],
@@ -164,64 +167,85 @@ class ghost():
         return self.modifier
 
     def _preprocess(self):
+        self._log("Starting preprocessing",1)
         tasks=[prepro for prepro in self.prepro.values() if prepro.stage()=="general"]
         tasks.sort(key=lambda x:x.order())
         for task in tasks:
+            self._log(f"Applying preprocessing {task.ident()}",0)
             self.x,self.y=task.apply(self.x,self.y,self)
     def apply_preprocessing(self,data, labels=None):
+        self._log("Starting preprocessing for the new data",0)
         x,y=data,labels
         if y is None:
             y=np.zeros(len(x))
         tasks=[prepro for prepro in self.prepro.values() if prepro.stage()=="general"]
         tasks.sort(key=lambda k:k.order())
         for prepro in tasks:
+            self._log(f"Applying preprocessing {task.ident()}",0)
             x,y=prepro.apply(x,y,None)
         if labels is None:
             return x
         return x,y
     def _preprocess_train(self):
+        self._log("Starting training data preprocessing",1)
         tasks=[prepro for prepro in self.prepro.values() if prepro.stage()=="train"]
         tasks.sort(key=lambda x:x.order())
         for task in tasks:
+            self._log(f"Applying preprocessing {task.ident()}",0)
             self.tx,self.ty=task.apply(self.tx,self.ty,self)
 
     def _basic_data_loading(self):
+        self._log("Starting basic data loading",1)
         self.x,self.y=self.dataset.load_data(self.mods())
         self.input_shape=list(self.dataset.input_shape())
+        self._log(f"Got input shape {self.input_shape}",1)
         self._preprocess()
         if self.novelty is None:
+            self._log("Splitting data into training, query and gallery sets",1)
             self.tx,self.ty,self.qx,self.qy,self.gx,self.gy=datasplit(self.x,self.y,self.mods(),novelty=False)
         else:
+            self._log("Splitting data into training, query, gallery and novelty sets",1)
             self.tx,self.ty,self.qx,self.qy,self.gx,self.gy,self.nx=datasplit(self.x,self.y,self.mods(),novelty=True)
         self._preprocess_train()
     def _direct_data_loading(self):
+        self._log("Starting data loading without splits",1)
         self.x,self.y=self.dataset.load_data(self.mods())
         self.input_shape=list(self.dataset.input_shape())
+        self._log(f"Got input shape {self.input_shape}",1)
         self._preprocess()
         self.tx,self.ty=self.x,self.y
         self._preprocess_train()
     def _crossval_data_loading(self):
+        self._log("Starting crossvalidation data loading",1)
         self.x,self.y=self.dataset.load_data(self.mods())
         self.input_shape=list(self.dataset.input_shape())
+        self._log(f"Got input shape {self.input_shape}",1)
         self._preprocess()
         fold=0
         if self.novelty is None:
+            self._log("Splitting data into training, query and gallery sets",1)
             for self.tx,self.ty,self.qx,self.qy,self.gx,self.gy in crossvalidation(self.x,self.y,self.mods(),novelty=False):
+                self._log(f"Starting fold {fold}",1)
                 self._preprocess_train()
                 yield fold
                 fold+=1
         else:
+            self._log("Splitting data into training, query, gallery and novelty sets",1)
             for self.tx,self.ty,self.qx,self.qy,self.gx,self.gy,self.nx in crossvalidation(self.x,self.y,self.mods(),novelty=True):
+                self._log(f"Starting fold {fold}",1)
                 self._preprocess_train()
                 yield fold
                 fold+=1
         
     def _create_model(self):
+        self._log("Building the model",1)
         self.model.build(self.input_shape,self.loss.siamese_count(),self.mods())
     def _pretrain_prediction(self):
         pretrain_epochs=self.mods()("pretrain_epochs",1)
         pretrain_loss=self.mods()("pretrain_los","categorical_crossentropy")
         pretrain_optimizer=self.mods()("pretrain_optimizer","adam")
+
+        self._log(f"Pretraining the model for {pretrain_epochs} epochs",1)
 
         inp=keras.Input(shape=self.input_shape)
         classes=list(set(self.ty))
@@ -250,10 +274,14 @@ class ghost():
         terminate_on_nan=self.mods()("terminate_on_nan",True)
         callbacks=list(self.mods()("callbacks",[]))
         kwargs=dict(self.mods()("fit_kwargs",{}))
+        verbose=self.mods()("verbose","auto")
+
 
         loss=self.loss.build(self.mods())
+        self._log("Compiling the model",1)
         self.model.compile(loss=loss,optimizer=optimizer)
 
+        self._log("Building the training data",1)
         Nlets, labels=build_Nlets(self.tx,self.ty,self.loss.Nlet_string(),self.mods())
 
         #print(Nlets.shape,labels.shape)
@@ -267,7 +295,11 @@ class ghost():
         if terminate_on_nan:
             callbacks.append(keras.callbacks.TerminateOnNaN())
 
-        self.logs=self.model.fit(Nlets,labels,epochs=epochs,batch_size=batch_size,validation_split=validation_split,callbacks=callbacks,**kwargs)
+        self._log("Training the model",1)
+        self.logs=self.model.fit(Nlets,labels,epochs=epochs,batch_size=batch_size,validation_split=validation_split,callbacks=callbacks,verbose=verbose,**kwargs)
+        self._log("Training complete",1)
+        self._log("Training logs:",0)
+        self._log(str(self.logs.history),0)
         return self.logs
 
     def _embed(self,data):
@@ -275,6 +307,7 @@ class ghost():
         return self.model.embed(data)
 
     def _create_embeddings(self):
+        self._log("Creating embeddings using the trained model",1)
         self.emb =self._embed(self.tx)
         self.qemb=self._embed(self.qx)
         self.gemb=self._embed(self.gx)
@@ -292,40 +325,58 @@ class ghost():
     def load_model(self,pth=None):
         if pth is None:
             pth=self.mods()("model_file","eereid_model")
+        self._log(f"Loading model from {pth}",1)
         self.set_model(ee.models.load_model(pth))
+        self._log("Model loaded",0)
 
     def save_model(self,pth=None):
         if pth is None:
             pth=self.mods()("model_file","eereid_model")
+        self._log(f"Saving model to {pth}",1)
         self.model.save_model(pth)
+        self._log("Model saved",0)
 
     def save_data(self,pth):
+        self._log(f"Saving data to {pth}",1)
         np.savez_compressed(pth,**self._all_available_data())
+        self._log("Data saved",0)
 
     def load_data(self,pth):
+        self._log(f"Loading data from {pth}",1)
         self.set_dataset(ee.datasets.load_data(pth))
+        self._log("Data loaded",0)
 
     def _basic_accuracy(self):
+        self._log("Starting the evaluation",1)
         self._create_embeddings()
 
         distance=self.distance
 
+        self._log("Calculating the accuracy",1)
         acc=rankN(self.qemb,self.qy,self.gemb,self.gy,distance=distance)
+        self._log(f"Accuracy calculated:",0)
+        self._log(str(acc),0)
 
         if self.novelty is not None:
+            self._log("Calculating the novelty detection accuracy",1)
+            self._log("Creating the novelty model",1)
+            self._log("Training the novelty model",1)
             self.novelty.inherit_info(self)
             self.novelty.create_model(self.gemb)
             normal=self.qemb
             abnormal=self.nemb
             test=np.concatenate([normal,abnormal])
             label=np.concatenate([np.zeros(len(normal)),np.ones(len(abnormal))])
+            self._log("Evaluating the novelty model",1)
             acc["auc"]=roc_auc_score(label,self.novelty.predict(test))
+            self._log(f"Novelty detection AUC calculated: {acc['auc']}",0)
 
         
 
         return acc
 
     def evaluate(self):
+        self._log("Evaluating the following model\n"+self.explain(),1)
         self._basic_data_loading()
         if self.mods().hasattr("crossval"):
             return self._crossval_eval()
@@ -343,6 +394,8 @@ class ghost():
         return acc
 
     def train(self):
+        self._log("Training the following model",1)
+        self._log(self.explain(),1)
         self._direct_data_loading()
         if self.mods().hasattr("pretrain"):
             self._pretrain_prediction()
@@ -352,21 +405,26 @@ class ghost():
 
     def assert_trained(self):
         if self.mods().hasattr("model_file") and os.path.exists(self.mods()("model_file")):
+            self._log("Model file found, loading the model",1)
             self.load_model()
         if self.model.trained==False:
+            self._log("Model not trained, training the model",1)
             self.train()
 
     def embed(self,data):
+        self._log("Embedding data",0)
         self.assert_trained()
         data=self.apply_preprocessing(data)
         return self.model.embed(data)
 
     def clear_gallery(self):
+        self._log("Clearing the gallery",1)
         self.gemb=[]
         self.gx=[]
         self.gy=[]
 
     def add_to_gallery(self,data,labels):
+        self._log(f"Adding {len(labels)} samples to the gallery",1)
         self.assert_trained()
         data,labels=self.apply_preprocessing(data,labels)
         self.gemb=np.concatenate([self.gemb,self.embed(data)],axis=0)
@@ -374,6 +432,7 @@ class ghost():
         self.gy=np.concatenate([self.gy,labels],axis=0)
 
     def predict(self,data):
+        self._log("Predicting labels for the data",0)
         emb=self.embed(data)
         ret=[]
         for e in tqdm(emb):
@@ -386,11 +445,13 @@ class ghost():
 
 
     def _repeated_eval(self,n):
+        self._log("Starting repeated evaluation",1)
         if type(n) is bool:
             n=10
         #should be done through modifier
         accs=None
         for i in range(n):
+            self._log(f"Starting repetition {i}",1)
             acc=self._singular_eval()
             if accs is None:
                 accs=acc
@@ -399,9 +460,11 @@ class ghost():
         return accs
 
     def _crossval_eval(self):
+        self._log("Starting crossvalidation evaluation",1)
         #should be done through modifier
         accs=None
         for i in self._crossval_data_loading():
+            self._log(f"Starting fold {i}",1)
             if self.mods().hasattr("repeated"):
                 acc=self._repeated_eval(self.mods()("repeated"))
             else:
@@ -414,6 +477,7 @@ class ghost():
 
 
     def plot_embeddings(self,alpha=1.0):
+        self._log("Plotting the embeddings",1)
         from sklearn.decomposition import PCA
 
         pca=PCA(n_components=2)
@@ -453,6 +517,7 @@ class ghost():
         plt.colorbar()
 
     def plot_loss(self,log=False):
+        self._log("Plotting the loss",1)
         assert self.logs is not None
         h=self.logs.history
         for key,y in h.items():
@@ -468,6 +533,7 @@ class ghost():
 
 
     def __add__(self,other):
+        self._log("Adding two ghosts and building an haunting (ensemble)",1)
         if type(self) is haunting and type(other) is haunting:
             return haunting(*self.objs,*other.objs)
         if type(self) is haunting and type(other) is not haunting:
@@ -496,7 +562,14 @@ class haunting(ghost):
                 return getattr(obj,attr)
         return None
 
+    def _log(self,msg,importance=1):
+        for obj in self.objs:
+            obj._log(msg,importance)
+        super()._log(msg,importance)
+
+
     def _basic_data_loading(self):
+        self._log("Starting ensemble type data loading",1)
         self.x,self.y=self.dataset.load_data(self.mods())
         self.input_shape=list(self.dataset.input_shape())
         self._preprocess()
@@ -508,9 +581,11 @@ class haunting(ghost):
             obj.tx,obj.ty,obj.qx,obj.qy,obj.gx,obj.gy=datasplit(obj.x,obj.y,obj.mods())
             obj._preprocess_train()
     def _embed(self,data):
+        self._log("Embedding data using the ensemble",0)
         return np.concatenate([obj.model._embed(data) for obj in self.objs],axis=1)
 
     def _singular_eval(self):
+        self._log("Starting ensemble type evaluation",1)
         for obj in self.objs:
             obj._create_model()
             if obj.mods().hasattr("pretrain"):obj._pretrain_prediction()
@@ -521,11 +596,13 @@ class haunting(ghost):
         return acc
 
     def _crossval_data_loading(self):
+        self._log("Starting ensemble type crossvalidation data loading",1)
         self.x,self.y=self.dataset.load_data(self.mods())
         self.input_shape=list(self.dataset.input_shape())
         self._preprocess()
         fold=0
         for self.tx,self.ty,self.qx,self.qy,self.gx,self.gy in crossvalidation(self.x,self.y,self.mods()):
+            self._log(f"Starting fold {fold}",1)
             for obj in self.objs:
                 obj.x=self.x
                 obj.y=self.y
@@ -536,11 +613,13 @@ class haunting(ghost):
             fold+=1
 
     def _create_embeddings(self):
+        self._log("Creating embeddings using the ensemble",1)
         self.emb =np.concatenate([obj._embed(obj.tx) for obj in self.objs],axis=1)
         self.qemb=np.concatenate([obj._embed(obj.qx) for obj in self.objs],axis=1)
         self.gemb=np.concatenate([obj._embed(obj.gx) for obj in self.objs],axis=1)
 
     def __add__(self,other):
+        self._log("Adding two ghosts and building an haunting (ensemble)",1)
         if type(self) is haunting and type(other) is haunting:
             return haunting(*self.objs,*other.objs)
         if type(self) is haunting and type(other) is not haunting:

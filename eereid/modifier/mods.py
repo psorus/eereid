@@ -1,3 +1,4 @@
+import time
 
 class mods(object):
 
@@ -39,4 +40,26 @@ class mods(object):
             return str(q)
 
         return "Modifier:"+"\n".join([f"    {k}: {subexplain(v)}" for k,v in self.dic.items()])
+
+
+    def log(self,message,importance=1):
+        #the higher the importance, the more important the message is. If importance over border importance, the message will be printed
+        log_file=self("log_file",None)
+        print_border=self("log_level_print",2)
+        log_border=self("log_level_log",0)
+        if importance>=print_border:
+            print(message)
+        if not log_file is None and importance>=log_border:
+            with open(log_file,"a") as f:
+                f.write(time.strftime("%Y-%m-%d %H:%M:%S")+": "+message+"\n")
+                #f.write(message+"\n")
+
+
+
+
+
+
+
+
+
 
