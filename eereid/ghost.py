@@ -243,8 +243,13 @@ class ghost():
         optimizer=self.mods()("optimizer","adam")
         epochs=self.mods()("epochs",10)
         batch_size=self.mods()("batch_size",32)
-        #meeeehr
-        #lr early stopping val split....
+        validation_split=self.mods()("validation_split",0.1)
+        early_stopping=self.mods()("early_stopping",True)
+        patience=self.mods()("patience",5)
+        restore_best_weights=self.mods()("restore_best_weights",True)
+        terminate_on_nan=self.mods()("terminate_on_nan",True)
+        callbacks=list(self.mods()("callbacks",[]))
+        kwargs=dict(self.mods()("fit_kwargs",{}))
 
         loss=self.loss.build(self.mods())
         self.model.compile(loss=loss,optimizer=optimizer)
@@ -257,7 +262,12 @@ class ghost():
 
         #exit()
 
-        self.logs=self.model.fit(Nlets,labels,epochs=epochs,batch_size=batch_size)
+        if early_stopping:
+            callbacks.append(keras.callbacks.EarlyStopping(patience=patience,restore_best_weights=restore_best_weights))
+        if terminate_on_nan:
+            callbacks.append(keras.callbacks.TerminateOnNaN())
+
+        self.logs=self.model.fit(Nlets,labels,epochs=epochs,batch_size=batch_size,validation_split=validation_split,callbacks=callbacks,**kwargs)
         return self.logs
 
     def _embed(self,data):
