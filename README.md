@@ -31,5 +31,23 @@ In main.py, you can now tinker with training and testing parameters such as:
 * Dataset split
 * Novelty detection
 
-# How can I use my own models and datasets?
+# How can I use my own datasets?
 
+Navigate to the tests folder and open create_datasets.py. Depending on the labeling of your data, you can add the path to your dataset here and simply import it by running create_datasets.py, which will generate an npz-file out of your dataset.
+
+# How can I use my own models?
+
+TBD
+
+# What about all those other files and folders?
+
+* tests:
+* eereid:
+  * datasets
+  * distances
+  * experiments
+  * losses
+  * models
+  * modifier
+  * novelty
+  * prepros
