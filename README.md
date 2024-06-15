@@ -16,3 +16,20 @@ Navigate to the installation directory and run install.sh in a terminal to insta
 ```sh install.sh```
 
 And that's it - With only five required moldues installed, you are now good to go!
+
+# How can I get started?
+
+To see if the installation went well, you can navigate to the tests folder and run main.py. This will train and test a simple CNN on MNIST and you will be provided with Ranked Accuracy and mAP for evaluation purposes.
+In main.py, you can now tinker with training and testing parameters such as:
+* Loss functions
+* Distance functions
+* Model selection
+* Dataset selection
+* Data preprocessing
+* Training duration & early stopping
+* Training folds
+* Dataset split
+* Novelty detection
+
+# How can I use my own models and datasets?
+
