@@ -15,7 +15,7 @@ import eereid as ee
 from tqdm import tqdm
 
 class ghost():
-    def __init__(self,*tags,dataset=None, distance=None, loss=None, model=None, novelty=None, experiments=None,modifier=None,prepros=None,preprocessing=None, **kwargs):
+    def __init__(self,*tags,dataset=None, distance=None, loss=None, model=None, novelty=None, experiments=None,modifier=None,preproc=None,prepros=None,preprocessing=None, **kwargs):
         #add kwargs 
         self.dataset=ee.datasets.mnist()
         self.distance=ee.distances.euclidean()
@@ -59,6 +59,12 @@ class ghost():
                     self.add_prepro(prepro)
             else:
                 self.add_prepro(prepros)
+        if preproc is not None:
+            if type(preproc) is list:
+                for prepro in preproc:
+                    self.add_prepro(prepro)
+            else:
+                self.add_prepro(preproc)
         if preprocessing is not None:
             if type(preprocessing) is list:
                 for prepro in preprocessing:
