@@ -22,6 +22,8 @@ class distance(novelty):
         return ret
 
     def explain(self):
+        if self.metric=="auto":
+            return "Novelty detection based on distance from the normal data. Using the same distance function as the reidentification model"
         return "Novelty detection based on distance from the normal data. Using the following distance function:\n    "+self.metric.explain()
 
 

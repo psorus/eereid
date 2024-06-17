@@ -44,12 +44,12 @@ class mods(object):
 
     def log(self,message,importance=1):
         #the higher the importance, the more important the message is. If importance over border importance, the message will be printed
-        log_file=self("log_file",None)
+        log_file=self("log_file","")
         print_border=self("log_level_print",2)
         log_border=self("log_level_log",0)
         if importance>=print_border:
             print(message)
-        if not log_file is None and importance>=log_border:
+        if not (log_file=="") and importance>=log_border:
             with open(log_file,"a") as f:
                 f.write(time.strftime("%Y-%m-%d %H:%M:%S")+": "+message+"\n")
                 #f.write(message+"\n")
