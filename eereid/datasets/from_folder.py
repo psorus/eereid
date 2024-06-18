@@ -59,6 +59,7 @@ class from_folder(dataset):
             reshape=(int(np.median(wids)),int(np.median(heis)))
         else:
             raise ValueError("reshape must be 'max', 'min', 'mean', 'median' or an int tuple")
+        print("Reshaping to {}".format(reshape))
         return reshape
 
 
