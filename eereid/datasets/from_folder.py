@@ -46,8 +46,8 @@ class from_folder(dataset):
         for fn in itera:
             im=Image.open(fn)
             ims.append(im)
-            wids.append(im.size[0])
-            heis.append(im.size[1])
+            wids.append(im.size[1])
+            heis.append(im.size[0])
             im.close()
         if reshape=="max":
             reshape=(max(wids),max(heis))
