@@ -10,12 +10,13 @@ from PIL import Image
 from tqdm import tqdm
 
 class from_folder(dataset):
-    def __init__(self,pth,label,include=None):
+    def __init__(self,pth,label,reshape="median",include=None):
         if include is None:
             include= lambda x: True
         self.pth = pth
         self.label = label
         self.include = include
+        self.reshape = reshape
         super().__init__("from_folder")
         self.search_files()
 
@@ -40,17 +41,38 @@ class from_folder(dataset):
         
 
     def load_raw(self):
+        reshape=self.reshape
         x,y=[],[]
         itera=tqdm(self.files)
         itera.set_description("Loading images")
+        ims=[]
         for fn in itera:
-            x.append(np.array(Image.open(fn)))
+            im=Image.open(fn)
+            ims.append(im)
         if callable(self.label):
             y = [self.label(f) for f in self.files]
         elif type(self.label) is str:
             y = [re.match(self.label,f).group(1) for f in self.files]
         else:
             raise ValueError("label must be a callable or a string")
+        if type(reshape) is str:
+            wids=[im.size[0] for im in ims]
+            heis=[im.size[1] for im in ims]
+            if reshape=="max":
+                reshape=(max(wids),max(heis))
+            elif reshape=="min":
+                reshape=(min(wids),min(heis))
+            elif reshape=="mean":
+                reshape=(int(np.mean(wids)),int(np.mean(heis)))
+            elif reshape=="median":
+                reshape=(int(np.median(wids)),int(np.median(heis)))
+            else:
+                raise ValueError("reshape must be 'max', 'min', 'mean', 'median' or an int tuple")
+
+        for im in ims:
+            if reshape is not None:
+                im = im.resize(self.reshape)
+            x.append(np.array(im))
         x = np.array(x)
         y = np.array(y)
         return x,y
