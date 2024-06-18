@@ -10,7 +10,7 @@ from PIL import Image
 from tqdm import tqdm
 
 class from_folder(dataset):
-    def __init__(self,pth,label,reshape="median",include=None):
+    def __init__(self,pth,label,include=None,reshape="median"):
         if include is None:
             include= lambda x: True
         self.pth = pth
@@ -39,40 +39,47 @@ class from_folder(dataset):
         print("Found {} files".format(len(self.files)))
 
         
-
-    def load_raw(self):
-        reshape=self.reshape
-        x,y=[],[]
-        itera=tqdm(self.files)
-        itera.set_description("Loading images")
+    def auto_size(self,reshape):
+        itera=tqdm(self.files,desc="Determining Image Sizes")
         ims=[]
+        wids,heis=[],[]
         for fn in itera:
             im=Image.open(fn)
             ims.append(im)
+            wids.append(im.size[0])
+            heis.append(im.size[1])
+            im.close()
+        if reshape=="max":
+            reshape=(max(wids),max(heis))
+        elif reshape=="min":
+            reshape=(min(wids),min(heis))
+        elif reshape=="mean":
+            reshape=(int(np.mean(wids)),int(np.mean(heis)))
+        elif reshape=="median":
+            reshape=(int(np.median(wids)),int(np.median(heis)))
+        else:
+            raise ValueError("reshape must be 'max', 'min', 'mean', 'median' or an int tuple")
+        return reshape
+
+
+    def load_raw(self):
+        reshape=self.reshape
+        if type(reshape) is str:
+            reshape=self.auto_size(reshape)
+        x,y=[],[]
+        itera=tqdm(self.files)
+        itera.set_description("Loading images")
+        for fn in itera:
+            im=Image.open(fn)
+            if reshape is not None:
+                im = im.resize(reshape)
+            x.append(np.array(im))
         if callable(self.label):
             y = [self.label(f) for f in self.files]
         elif type(self.label) is str:
             y = [re.match(self.label,f).group(1) for f in self.files]
         else:
             raise ValueError("label must be a callable or a string")
-        if type(reshape) is str:
-            wids=[im.size[0] for im in ims]
-            heis=[im.size[1] for im in ims]
-            if reshape=="max":
-                reshape=(max(wids),max(heis))
-            elif reshape=="min":
-                reshape=(min(wids),min(heis))
-            elif reshape=="mean":
-                reshape=(int(np.mean(wids)),int(np.mean(heis)))
-            elif reshape=="median":
-                reshape=(int(np.median(wids)),int(np.median(heis)))
-            else:
-                raise ValueError("reshape must be 'max', 'min', 'mean', 'median' or an int tuple")
-
-        for im in ims:
-            if reshape is not None:
-                im = im.resize(self.reshape)
-            x.append(np.array(im))
         x = np.array(x)
         y = np.array(y)
         return x,y
