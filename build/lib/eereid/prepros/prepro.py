@@ -7,7 +7,7 @@ class prepro(gag):
         super().__init__(name)
 
     def apply(self, data,labels,eereid):
-        self._apply_special(eereid)
+        if eereid is not None:self._apply_special(eereid)
         return np.array([self._apply_one(d) for d in data]),labels
 
 
@@ -26,3 +26,11 @@ class prepro(gag):
         return self.name
         #raise NotImplementedError("This is an abstract method")
 
+    def stage(self):
+        return "general"
+
+    def order(self):
+        return 0.0
+
+    def explain(self):
+        return "Generic preprocessing gag"

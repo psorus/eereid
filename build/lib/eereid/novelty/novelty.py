@@ -5,6 +5,9 @@ class novelty(gag):
         super().__init__(name)
         self.trained=False
 
+    def inherit_info(self, ghost):
+        pass
+
     def create_model(self,normal):
         """trains a model to predict novelty"""
         raise NotImplementedError
@@ -17,3 +20,6 @@ class novelty(gag):
         self.savehelper(pth,"novelty.json",**kwargs)
 
     def species(self):return "novelty"
+
+    def explain(self):
+        return "Generic Novelty Detection gag"

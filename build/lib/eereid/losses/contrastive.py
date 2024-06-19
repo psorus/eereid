@@ -12,13 +12,13 @@ class contrastive(loss):
     def build(self,mods):
 
         def func(y_true, y_pred):
+            #print(y_true.shape,y_pred.shape)
+            #exit()
             #aa: 1/2 D**2
             #ab: 1/2 max(0,margin-D)**2
-            anchor, positive, negative = y_pred[0], y_pred[1], y_pred[2]
-            positive_dist = K.sum(K.square(anchor - positive), axis=-1)
-            negative_dist = K.sum(K.square(anchor - negative), axis=-1)
-            contrast=(positive_dist+K.maximum(0.,self.margin-negative_dist))
-            return K.sum(contrast, axis=-1)
+            a,b=y_pred[0],y_pred[1]
+            dist=K.sum(K.square(a-b),axis=-1)
+            return K.sum(y_true*dist+(1-y_true)*K.maximum(0.,self.margin-dist),axis=-1)
 
         return func
 
@@ -27,6 +27,9 @@ class contrastive(loss):
 
     def Nlet_string(self):
         #usual contrastive would only use aa/ab, but this requires a y value. So for consistency we absorb both terms into one aab loss function
-        return "aab"
+        return "aa/ab"
+
+    def explain(self):
+        return "Contrastive loss with margin of "+str(self.margin)+". The formula is 1/2 D**2 for same class pairs and 1/2 max(0,margin-D)**2 for different class pairs."
         
 

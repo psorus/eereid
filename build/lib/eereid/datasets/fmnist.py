@@ -21,6 +21,9 @@ class fmnist(dataset):
     def sample_count(self):
         return 70000
 
+    def explain(self):
+        return "Fashion MNIST data loader"
+
 
 if __name__=="__main__":
     m=fmnist()

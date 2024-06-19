@@ -38,3 +38,6 @@ class quadruplet(loss):
     def Nlet_string(self):
         return "aabc"
 
+    def explain(self):
+        return "Quadruplet loss with margin of "+str(self.margin)+". The formula is relu(D(a,p)-loss_aggregator(D(a,n),D(a,n2))+margin)."
+

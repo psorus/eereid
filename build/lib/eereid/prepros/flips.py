@@ -11,6 +11,7 @@ class flips(prepro):
         datas.append(data)
         datas.append(np.flip(data,1))
         datas.append(np.flip(data,2))
+        datas.append(np.flip(datas[-1],1))
         datas=np.concatenate(datas,axis=0)
         labels=np.tile(labels,3)
 
@@ -24,3 +25,8 @@ class flips(prepro):
     def save(self,pth,index):
         super().save(pth,index,seed=self.seed)
 
+    def stage(self):return "train"
+    def order(self):return 2
+
+    def explain(self):
+        return "Adds additional training images by flipping each training images. Quadruples the number of training images."

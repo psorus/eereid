@@ -25,6 +25,9 @@ class simple_dense(wrapmodel):
 
         self.submodel=keras.models.Model(inputs=inp,outputs=q)
 
+    def explain(self):
+        return "Creating a simple dense neural network model."
+
 
 
 

@@ -22,5 +22,8 @@ class gag(object):
     def species(self):
         raise NotImplementedError("Method not implemented")
 
+    def explain(self):
+        return "This is a generic GAG object, specifing some part of a reid model"
+
 
 

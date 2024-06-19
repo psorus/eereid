@@ -16,6 +16,8 @@ class pyod_wrapper(novelty):
     def predict(self,samples):
         return self.model.decision_function(samples)
 
+    def explain(self):
+        return "Generic PyOD Wrapper Novelty Detection gag"
 
 
 

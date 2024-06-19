@@ -11,6 +11,9 @@ class pretrain(modifier):
     def additional(self):
         return self.kwargs
 
+    def explain(self):
+        return "Modifier enabling pretraining with the following parameters: {}".format(self.kwargs)
+
 
 
 

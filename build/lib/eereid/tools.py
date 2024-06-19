@@ -23,7 +23,7 @@ def uqdm(iterable,rounde=4,*args,**kwargs):
 def datasplit(x,y, mods, novelty=False):
     f_train=mods("train_fraction",0.6)
     f_novel=mods("novel_fraction",0.1)
-    f_val=mods("val_fraction",0.5)
+    f_que=mods("query_fraction",0.5)
     seed=mods("datasplit_seed",42)
     if novelty==False:
         f_novel=0.0
@@ -62,19 +62,19 @@ def datasplit(x,y, mods, novelty=False):
         novel_x=novel_x[idx]
 
 
-    val_x,val_y,gal_x,gal_y=[],[],[],[]
+    que_x,que_y,gal_x,gal_y=[],[],[],[]
     for cls in test_cls:
         idx=np.arange(len(class_to_samples[cls]))
         rnd.shuffle(idx)
-        val=idx[:int(f_val*len(idx))]
-        gal=idx[int(f_val*len(idx)):]
-        val_x.append(class_to_samples[cls][val])
-        val_y.append(np.repeat(cls, len(val)))
+        que=idx[:int(f_que*len(idx))]
+        gal=idx[int(f_que*len(idx)):]
+        que_x.append(class_to_samples[cls][que])
+        que_y.append(np.repeat(cls, len(que)))
         gal_x.append(class_to_samples[cls][gal])
         gal_y.append(np.repeat(cls, len(gal)))
 
-    val_x=np.concatenate(val_x, axis=0)
-    val_y=np.concatenate(val_y, axis=0)
+    que_x=np.concatenate(que_x, axis=0)
+    que_y=np.concatenate(que_y, axis=0)
     gal_x=np.concatenate(gal_x, axis=0)
     gal_y=np.concatenate(gal_y, axis=0)
 
@@ -83,21 +83,21 @@ def datasplit(x,y, mods, novelty=False):
     gal_x=gal_x[idx]
     gal_y=gal_y[idx]
 
-    idx=np.arange(len(val_x))
+    idx=np.arange(len(que_x))
     rnd.shuffle(idx)
-    val_x=val_x[idx]
-    val_y=val_y[idx]
+    que_x=que_x[idx]
+    que_y=que_y[idx]
 
     if len(novel_cls)==0:
-        return train_x,train_y,val_x,val_y,gal_x,gal_y
+        return train_x,train_y,que_x,que_y,gal_x,gal_y
     else:
-        return train_x,train_y,val_x,val_y,gal_x,gal_y,novel_x
+        return train_x,train_y,que_x,que_y,gal_x,gal_y,novel_x
 
 def crossvalidation(x,y, mods, novelty=False):
     folds=mods("folds",5)
     folds_novel=mods("novel_folds",1)
     folds_train=mods("train_folds",3)
-    f_val=mods("val_fraction",0.5)
+    f_que=mods("query_fraction",0.5)
     seed=mods("datasplit_seed",42)
     if novelty==False:
         folds_novel=0
@@ -141,19 +141,19 @@ def crossvalidation(x,y, mods, novelty=False):
             rnd.shuffle(idx)
             novel_x=novel_x[idx]
 
-        val_x,val_y,gal_x,gal_y=[],[],[],[]
+        que_x,que_y,gal_x,gal_y=[],[],[],[]
         for cls in test_cls:
             idx=np.arange(len(class_to_samples[cls]))
             rnd.shuffle(idx)
-            val=idx[:int(f_val*len(idx))]
-            gal=idx[int(f_val*len(idx)):]
-            val_x.append(class_to_samples[cls][val])
-            val_y.append(np.repeat(cls, len(val)))
+            que=idx[:int(f_que*len(idx))]
+            gal=idx[int(f_que*len(idx)):]
+            que_x.append(class_to_samples[cls][que])
+            que_y.append(np.repeat(cls, len(que)))
             gal_x.append(class_to_samples[cls][gal])
             gal_y.append(np.repeat(cls, len(gal)))
 
-        val_x=np.concatenate(val_x, axis=0)
-        val_y=np.concatenate(val_y, axis=0)
+        que_x=np.concatenate(que_x, axis=0)
+        que_y=np.concatenate(que_y, axis=0)
         gal_x=np.concatenate(gal_x, axis=0)
         gal_y=np.concatenate(gal_y, axis=0)
     
@@ -162,15 +162,15 @@ def crossvalidation(x,y, mods, novelty=False):
         gal_x=gal_x[idx]
         gal_y=gal_y[idx]
     
-        idx=np.arange(len(val_x))
+        idx=np.arange(len(que_x))
         rnd.shuffle(idx)
-        val_x=val_x[idx]
-        val_y=val_y[idx]
+        que_x=que_x[idx]
+        que_y=que_y[idx]
 
         if novelty:
-            yield train_x,train_y,val_x,val_y,gal_x,gal_y,novel_x
+            yield train_x,train_y,que_x,que_y,gal_x,gal_y,novel_x
         else:
-            yield train_x,train_y,val_x,val_y,gal_x,gal_y
+            yield train_x,train_y,que_x,que_y,gal_x,gal_y
 
 def build_triplets(x,y,mods):
     count=mods("triplet_count",10000)
@@ -202,8 +202,9 @@ def _choose_one(lis):
     dex=np.random.choice(len(lis))
     return lis[dex]
 
-def build_Nlets(x,y,generator,mods):
+def _build_Nlets(x,y,generator,mods,count_multiplier=1.0):
     count=mods("Nlet_count",mods("triplet_count",10000))
+    count=int(count*count_multiplier)
     generator=[gen for gen in generator]
     N=len(generator)
     types=list(set(generator))
@@ -229,18 +230,27 @@ def build_Nlets(x,y,generator,mods):
     
     return np.array(Nlets)
 
+def build_Nlets(x,y,generator,mods):
+    subg=generator.split("/")
+    parts=[_build_Nlets(x,y,sub,mods,1/len(subg)) for sub in subg]
+    ys=np.concatenate([np.repeat(i,len(part)) for i,part in enumerate(parts)])
+    xs=np.concatenate(parts,axis=0)
+    ys=ys.astype(np.float32)
+    return xs,ys
 
 
 
-def rank1(val_emb,val_y,gal_emb,gal_y, distance):
+
+
+def rank1(que_emb,que_y,gal_emb,gal_y, distance):
     rank1=0
-    for i,func in uqdm(range(len(val_emb))):
-        dist=distance.multi_distance(gal_emb,val_emb[i])#np.linalg.norm(val_emb[i]-gal_emb, axis=1)
+    for i,func in uqdm(range(len(que_emb))):
+        dist=distance.multi_distance(gal_emb,que_emb[i])#np.linalg.norm(val_emb[i]-gal_emb, axis=1)
         idx=np.argsort(dist)
-        if gal_y[idx[0]]==val_y[i]:
+        if gal_y[idx[0]]==que_y[i]:
             rank1+=1
         func(rank1/(i+1))
-    return rank1/len(val_emb)
+    return rank1/len(que_emb)
 
 class anyrank():
     def __init__(self,hits,**kwargs):
@@ -269,7 +279,7 @@ class anyrank():
     def __setitem__(self,key,value):
         self.kwargs[key]=value
     def __getitem__(self,key):
-        return self(kwargs[key])
+        return self.kwargs[key]
 
 
 class statistics():
@@ -348,16 +358,16 @@ def compute_ap(ranks, n_relevant):
     ap = np.sum(precisions) / n_relevant
     return ap
 
-def rankN(val_emb, val_y, gal_emb, gal_y, distance, novelty=None):
+def rankN(que_emb, que_y, gal_emb, gal_y, distance, novelty=None):
     hits = []
     rank1 = 0
     ap_scores = []
 
-    for i, func in uqdm(range(len(val_emb))):
-        dist = distance.multi_distance(gal_emb, val_emb[i])  # np.linalg.norm(val_emb[i] - gal_emb, axis=1)
+    for i, func in uqdm(range(len(que_emb))):
+        dist = distance.multi_distance(gal_emb, que_emb[i])  # np.linalg.norm(val_emb[i] - gal_emb, axis=1)
         idx = np.argsort(dist)
         
-        relevant_indices = np.where(gal_y[idx] == val_y[i])[0]
+        relevant_indices = np.where(gal_y[idx] == que_y[i])[0]
         
         if len(relevant_indices) > 0:
             firsthit = relevant_indices[0]
@@ -366,7 +376,7 @@ def rankN(val_emb, val_y, gal_emb, gal_y, distance, novelty=None):
             hits.append(firsthit + 1)
             
             # Compute AP for this query
-            ap = compute_ap(relevant_indices, np.sum(gal_y == val_y[i]))
+            ap = compute_ap(relevant_indices, np.sum(gal_y == que_y[i]))
             ap_scores.append(ap)
         else:
             hits.append(len(gal_y) + 1)  # No hit case
@@ -379,6 +389,17 @@ def rankN(val_emb, val_y, gal_emb, gal_y, distance, novelty=None):
 
     return anyrank(np.array(hits), mAP=mAP)
 
+def add_tags(x, count=1):
+    add="".join(["    "]*count)
+    lines=x.split('\n')
+    lines=[f"{add}{line}" for line in lines]
+    return '\n'.join(lines)
+
+def various_tags(inf):
+    ret=[]
+    for xx,tt in inf:
+        ret.append(add_tags(xx,tt))
+    return '\n'.join(ret)
 
 
 

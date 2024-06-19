@@ -8,6 +8,8 @@ import os
 
 from tqdm import tqdm
 
+import functools
+
 hosts=["http://174.138.177.21:2156/eeri/{fn}"]
 class downloadable(dataset):
     def __init__(self,name):
@@ -27,10 +29,10 @@ class downloadable(dataset):
             print(f"Downloading {self.name} from {url}")
             r = requests.get(url, stream=True)
             total_size = int(r.headers.get('content-length', 0));
-            block_size = 1024
+            block_size = 1024*1024
             wrote = 0
             with open(path, 'wb') as f:
-                for data in tqdm(r.iter_content(block_size), total=np.ceil(total_size//block_size), unit='KB', unit_scale=True):
+                for data in tqdm(r.iter_content(block_size), total=np.ceil(total_size//block_size), unit='MB', unit_scale=True):
                     wrote = wrote + len(data)
                     f.write(data)
             if total_size != 0 and wrote != total_size:
@@ -39,6 +41,8 @@ class downloadable(dataset):
             else:
                 return True
         return False
+
+    @functools.lru_cache(maxsize=None)
     def load_raw(self):
         if not os.path.exists(self.path()):
             assert self.download_file(), "Download failed"
@@ -51,6 +55,8 @@ class downloadable(dataset):
     
     def sample_count(self):
         return len(self.load_raw()[0])
+
+    def explain(self):return "Generic data downloader gag"
 
 
 

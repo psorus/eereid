@@ -36,3 +36,5 @@ class ringloss(loss):
     def Nlet_string(self):
         return "abc"
 
+    def explain(self):
+        return "Ring loss with margin of "+str(self.margin)+". The formula is relu(margin+Norm(a)+Norm(b)+Norm(c)-D(a,b)-D(b,c)-D(c,a))."

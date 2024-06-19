@@ -23,3 +23,8 @@ class subsample(prepro):
     def save(self,pth,index):
         super().save(pth,index,frac=self.frac,seed=self.seed)
 
+    def stage(self):return "general"
+    def order(self):return 0
+
+    def explain(self):
+        return f"Reduces the fraction of samples used by factor {self.frac}. This is mostly useful for quickly debugging"

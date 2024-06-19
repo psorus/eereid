@@ -1,6 +1,10 @@
 from eereid.prepros.prepro import prepro
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    from eereid.importhelper import importhelper
+    cv2=importhelper("cv2","resize","pip install opencv-python")
 import numpy as np
 
 class resize(prepro):
@@ -19,3 +23,8 @@ class resize(prepro):
     def save(self,pth,index):
         super().save(pth,index,size=size)
 
+    def stage(self):return "general"
+    def order(self):return 2
+
+    def explain(self):
+        return f"Resizing each image to a size of {self.size}"

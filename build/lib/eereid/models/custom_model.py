@@ -16,6 +16,9 @@ class custom_model(wrapmodel):
         #assert (self.submodel.input_shape==input_shape), f"The provided model has a different input shape than the data ({self.submodel.input_shape} vs {input_shape})"
         pass
 
+    def explain(self):
+        return "Custom tensorflow model wrapper gag"
+
 
 
 

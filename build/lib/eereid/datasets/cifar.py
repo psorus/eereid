@@ -23,6 +23,8 @@ class cifar(dataset):
     def sample_count(self):
         return 60000
 
+    def explain(self):return "CIFAR-10 data loader"
+
 
 if __name__=="__main__":
     m=cifar()

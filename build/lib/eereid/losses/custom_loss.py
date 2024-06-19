@@ -21,3 +21,5 @@ class custom_loss(loss):
     def Nlet_string(self):
         return self.Nlet
 
+    def explain(self):
+        return "Custom loss function."

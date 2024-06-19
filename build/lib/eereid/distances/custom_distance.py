@@ -14,3 +14,6 @@ class custom_distance(distance):
     def save(self,pth):
         raise NotImplementedError
 
+    def explain(self):
+        return "Custom distance function"
+

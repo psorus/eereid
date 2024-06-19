@@ -16,4 +16,11 @@ class loss(gag):
         raise NotImplementedError
 
     def siamese_count(self):
-        return len(self.Nlet_string())
+        nl=self.Nlet_string()
+        if "/" in nl:
+            nl=nl.split("/")[0]
+        return len(nl)
+
+    def explain(self):
+        return "Generic loss function gag."
+

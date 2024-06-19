@@ -10,12 +10,13 @@ from PIL import Image
 from tqdm import tqdm
 
 class from_folder(dataset):
-    def __init__(self,pth,label,include=None):
+    def __init__(self,pth,label,include=None,reshape="median"):
         if include is None:
             include= lambda x: True
         self.pth = pth
         self.label = label
         self.include = include
+        self.reshape = reshape
         super().__init__("from_folder")
         self.search_files()
 
@@ -38,13 +39,42 @@ class from_folder(dataset):
         print("Found {} files".format(len(self.files)))
 
         
+    def auto_size(self,reshape):
+        itera=tqdm(self.files,desc="Determining Image Sizes")
+        ims=[]
+        wids,heis=[],[]
+        for fn in itera:
+            im=Image.open(fn)
+            ims.append(im)
+            wids.append(im.size[1])
+            heis.append(im.size[0])
+            im.close()
+        if reshape=="max":
+            reshape=(max(wids),max(heis))
+        elif reshape=="min":
+            reshape=(min(wids),min(heis))
+        elif reshape=="mean":
+            reshape=(int(np.mean(wids)),int(np.mean(heis)))
+        elif reshape=="median":
+            reshape=(int(np.median(wids)),int(np.median(heis)))
+        else:
+            raise ValueError("reshape must be 'max', 'min', 'mean', 'median' or an int tuple")
+        print("Reshaping to {}".format(reshape))
+        return reshape
+
 
     def load_raw(self):
+        reshape=self.reshape
+        if type(reshape) is str:
+            reshape=self.auto_size(reshape)
         x,y=[],[]
         itera=tqdm(self.files)
         itera.set_description("Loading images")
         for fn in itera:
-            x.append(np.array(Image.open(fn)))
+            im=Image.open(fn)
+            if reshape is not None:
+                im = im.resize(reshape)
+            x.append(np.array(im))
         if callable(self.label):
             y = [self.label(f) for f in self.files]
         elif type(self.label) is str:
@@ -63,6 +93,9 @@ class from_folder(dataset):
 
     def save(self,pth):
         super().save(pth,pth=self.pth,label=self.label,include=self.include)
+
+    def explain(self):
+        return f"Loading images from {self.pth}"
 
 
 

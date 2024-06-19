@@ -17,5 +17,8 @@ class lN(distance):
     def save(self,pth):
         super.save(pth,N=self.N)
 
+    def explain(self):
+        return "lN distance is a measure of distance between two vectors. It is calculated as the Nth root of the sum of the Nth powers of the differences between the two vectors. The formula is: (sum((a-b)^N))^(1/N)"
+
 
 

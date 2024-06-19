@@ -1,5 +1,9 @@
 from eereid.novelty.pyod_wrapper import pyod_wrapper
-from pyod.models.knn import KNN
+try:
+    from pyod.models.knn import KNN
+except ImportError:
+    from eereid.importhelper import importhelper
+    KNN=importhelper("pyod","knn novelty")
 
 
 class knn(pyod_wrapper):
@@ -11,6 +15,9 @@ class knn(pyod_wrapper):
 
     def init_model(self):
         self.model = KNN(*self.args, **self.kwargs)
+
+    def explain(self):
+        return f"Enabling Novelty Detection with a KNN model ({self.args}, {self.kwargs})"
 
 
 

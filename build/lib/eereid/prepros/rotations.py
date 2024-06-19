@@ -23,3 +23,8 @@ class rotations(prepro):
     def save(self,pth,index):
         super().save(pth,index,seed=self.seed)
 
+    def stage(self):return "train"
+    def order(self):return 1
+
+    def explain(self):
+        return "Adds additional training images by rotating each training images. Quadruples the number of training images."
