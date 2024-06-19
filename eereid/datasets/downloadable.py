@@ -42,7 +42,7 @@ class downloadable(dataset):
                 return True
         return False
 
-    @functools.cache
+    @functools.lru_cache(maxsize=None)
     def load_raw(self):
         if not os.path.exists(self.path()):
             assert self.download_file(), "Download failed"

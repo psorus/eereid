@@ -9,7 +9,7 @@ class load_data(dataset):
         super().__init__("load_data")
         self.pth = pth
 
-    @functools.cache
+    @functools.lru_cache(maxsize=None)
     def load_raw(self):
         f=np.load(self.pth)
         return f['x'],f['y']
