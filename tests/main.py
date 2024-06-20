@@ -38,7 +38,7 @@ from eereid.prepros.subsample import subsample
 from eereid.modifier.crossval import crossval
 from eereid.modifier.repeated import repeated
 
-from eereid.ghost import ensemble
+from eereid.ghost import haunting
 
 from eereid.novelty.knn import knn
 
