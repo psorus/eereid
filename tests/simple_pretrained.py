@@ -14,7 +14,8 @@ g["freeze"]=True
 
 #just to speed up the evaluation
 g(ee.prepros.subsample(0.1))
-g["triplet_count"]=1000
+g["triplet_count"]=100
+g["global_average_pooling"]=True
 
 
 acc=g.evaluate()

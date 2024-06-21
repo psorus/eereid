@@ -406,7 +406,7 @@ class ghost():
         if self.mods().hasattr("pretrain"):
             self._pretrain_prediction()
         self._train_model()
-        if seld.mods().hasattr("model_file"):
+        if self.mods().hasattr("model_file"):
             self.save_model()
 
     def assert_trained(self):
