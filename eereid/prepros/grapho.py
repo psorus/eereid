@@ -44,7 +44,7 @@ class grapho(prepro):
         values=self.func(subimages)
         border=np.sort(values)[-self.consider_count]
         positions=np.array(positions)[values>border]
-        values=values[values>border]
+        values=values[values>=border]
 
         #now lets combine similar positions together, until we have nodes positions left
 
