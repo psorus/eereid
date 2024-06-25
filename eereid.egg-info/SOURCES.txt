@@ -77,3 +77,4 @@ eereid/prepros/prepro.py
 eereid/prepros/resize.py
 eereid/prepros/rotations.py
 eereid/prepros/subsample.py
+tests/test.py

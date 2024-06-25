@@ -8,7 +8,6 @@ Author: Simon Klüttermann, Jérôme Rutinowski
 Author-email: Simon.Kluettermann@cs.tu-dortmund.de
 License: apache-2.0
 Keywords: Re-ID,Reidentification,Contrastive Learning,Metric Learning,Machine Learning,ML
-Platform: UNKNOWN
 Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Science/Research
 Classifier: Topic :: Software Development :: Build Tools
@@ -20,6 +19,7 @@ Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 License-File: LICENSE
-
-UNKNOWN
-
+Requires-Dist: tensorflow
+Requires-Dist: numpy
+Requires-Dist: scikit-learn
+Requires-Dist: tqdm

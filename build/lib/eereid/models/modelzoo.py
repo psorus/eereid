@@ -32,7 +32,6 @@ class modelzoo(wrapmodel):
         if global_average_pooling:
             x = GlobalAveragePooling2D()(x)
         
-        # for pcb usage
         elif pcb:
             x = AveragePooling2D()(x)
             x = Conv2D(1, 16)(x)

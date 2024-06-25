@@ -6,16 +6,16 @@ from tensorflow import keras
 from tensorflow.keras import backend as K
 
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Flatten, AveragePooling2D, Conv2D
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Flatten
 
-class modelzoo(wrapmodel):
+class pcb(wrapmodel):
     def __init__(self,model, *args, include_top=False, freeze=False, **kwargs):
         self.zoomodel=model
         self.include_top=include_top
         self.freeze=freeze
         self.args=args
         self.kwargs=kwargs
-        super().__init__("modelzoo")
+        super().__init__("pcb")
 
     def build_submodel(self,input_shape, mods):
         add_layers=mods("add_layer_count",1)
@@ -23,7 +23,6 @@ class modelzoo(wrapmodel):
         nodes=mods("nodes_per_layer",256)
         outputs=mods("output_size",100)
         global_average_pooling=mods("global_average_pooling",True)
-        pcb=mods("pcb", True)
         freeze=mods("freeze",self.freeze)
 
         base_model = self.zoomodel(*self.args, include_top=False, **self.kwargs)
@@ -31,11 +30,6 @@ class modelzoo(wrapmodel):
         x = base_model.output
         if global_average_pooling:
             x = GlobalAveragePooling2D()(x)
-        
-        # for pcb usage
-        elif pcb:
-            x = AveragePooling2D()(x)
-            x = Conv2D(1, 16)(x)
 
         x=Flatten()(x)
         
@@ -51,7 +45,7 @@ class modelzoo(wrapmodel):
         self.submodel = Model(inputs=base_model.input, outputs=predictions)
 
     def explain(self):
-        return f"Modelzoo loader gag, using the base model {self.zoomodel.__name__}." + ("Freezing the pretrained weights." if self.freeze else "")
+        return f"PCB loader gag, using the base model {self.zoomodel.__name__}." + ("Freezing the pretrained weights." if self.freeze else "")
 
 
 
