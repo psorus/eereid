@@ -29,21 +29,26 @@ class modelzoo(wrapmodel):
         base_model = self.zoomodel(*self.args, include_top=False, **self.kwargs)
 
         x = base_model.output
+        print("shape pre glob", x.shape)
         if global_average_pooling:
             x = GlobalAveragePooling2D()(x)
-        
+            print("shape after global pooling", x.shape)
+            
         # for pcb usage
         elif pcb:
             x = AveragePooling2D()(x)
+            print("shape after flatten", x.shape)
             x = Conv2D(1, 16)(x)
+            print("shape after conv2d", x.shape)
 
         x=Flatten()(x)
-        
+        print("shape after flatten", x.shape)
+
         for i in range(add_layers):
             x = Dense(nodes, activation=activation)(x)
         
-        predictions = Dense(outputs, activation='linear')(x)
-        #predictions = Dense(outputs, activation='softmax')(x)
+        #predictions = Dense(outputs, activation='linear')(x)
+        predictions = Dense(outputs, activation='softmax')(x) #softmax instead of linear
         
         if freeze:
             for layer in base_model.layers:
