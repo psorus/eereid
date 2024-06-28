@@ -43,6 +43,7 @@ class modelzoo(wrapmodel):
             x = Dense(nodes, activation=activation)(x)
         
         predictions = Dense(outputs, activation='linear')(x)
+        #predictions = Dense(outputs, activation='softmax')(x)
         
         if freeze:
             for layer in base_model.layers:
