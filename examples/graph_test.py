@@ -13,10 +13,10 @@ def func(x):
     return x
 
 g=ee.ghost(model=ee.models.simple_graph(),              #Use a simple convolutional model
-           dataset=ee.datasets.metal(),         #Train on mnist dataset
-           loss=ee.losses.extended_triplet(),   #Use Extended Triplet loss (+d(p,n)) for training
+           dataset=ee.datasets.pallet502(),         #Train on mnist dataset
+           loss=ee.losses.triplet(),   #Use Extended Triplet loss (+d(p,n)) for training
            prepros=[ee.prepros.grapho(func=func)],   #To speed up training, use only 10% of samples
-           triplet_count=1000,                   #To speed up training, use only 100 triplets for training
+           triplet_count=10000,                   #To speed up training, use only 100 triplets for training
            crossval=False,
            batch_size=100,
            step_size=100,
@@ -26,7 +26,11 @@ g=ee.ghost(model=ee.models.simple_graph(),              #Use a simple convolutio
 
 g["log_file"]=f"logz_{now}"     #Save training log
 
+#g.load_data("502.npz")
+
 acc=g.evaluate()        #Evaluate the model
+
+#g.save_data("502")
 
 embed=g.plot_embeddings()
 plt.show()
