@@ -27,9 +27,9 @@ models=[g,c,m,s]
 
 
 for model in models:
-    model["triplet_count"]=1000
-    model(ee.prepros.subsample(0.001))
-    dataset=ee.datasets.metal()
+    model["triplet_count"]=10000
+    model(ee.prepros.subsample(1))
+    dataset=ee.datasets.pallet502()
     batch_size=100
     step_size=100
     epochs=100
@@ -41,7 +41,11 @@ g=ee.haunting(*models)
 
 g["log_file"]=f"logz_{now}"     #Save training log
 
+#g.load_data("502.npz")
+
 acc=g.evaluate()        #Evaluate the model
+
+#g.save_data("502")
 
 #embed=g.plot_embeddings()
 #plt.show()
