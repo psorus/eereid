@@ -2,7 +2,8 @@ import eereid as ee
 
 from plt import *
 
-ds=ee.datasets.mnist()
+#ds=ee.datasets.mnist()
+ds=ee.datasets.palletlight()
 
 x,y=ds.load_raw()
 
