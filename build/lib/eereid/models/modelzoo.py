@@ -25,23 +25,27 @@ class modelzoo(wrapmodel):
         global_average_pooling=mods("global_average_pooling",True)
         pcb=mods("pcb", True)
         freeze=mods("freeze",self.freeze)
-
-        base_model = self.zoomodel(*self.args, include_top=False, **self.kwargs)
+        input_layer = tf.keras.layers.Input(shape=input_shape)
+        base_model = self.zoomodel(*self.args, include_top=False, **self.kwargs, input_tensor=input_layer)
 
         x = base_model.output
+        y = base_model.output_shape[1:3]
+        print("shape pre global_", y)
+        print("shape pre global", x.shape)
         if global_average_pooling:
-            x = GlobalAveragePooling2D()(x)
-        
-        elif pcb:
-            x = AveragePooling2D()(x)
-            x = Conv2D(1, 16)(x)
+            x = AveragePooling2D(y)(x)
+            print("shape after global pooling", x.shape)
+            x = Conv2D(256, 1)(x)
+            print("shape after conv2d", x.shape)
 
         x=Flatten()(x)
-        
+        print("shape after flatten", x.shape)
+
         for i in range(add_layers):
             x = Dense(nodes, activation=activation)(x)
         
-        predictions = Dense(outputs, activation='linear')(x)
+        #predictions = Dense(outputs, activation='linear')(x)
+        predictions = Dense(outputs, activation='softmax')(x) #softmax instead of linear
         
         if freeze:
             for layer in base_model.layers:
