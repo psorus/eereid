@@ -8,3 +8,4 @@ from .resize import resize
 from .rotations import rotations
 from .subsample import subsample
 from .grapho import grapho
+from .crop import crop

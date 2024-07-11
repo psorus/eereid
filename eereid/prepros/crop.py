@@ -29,4 +29,4 @@ class crop(prepro):
     def order(self):return 3
 
     def explain(self):
-        return f"Resizing each image to a size of {self.size}"
+        return f"Cropping image by {self.topx} pixels from the left, {self.topy} pixels from the top, {self.botx} pixels from the right, and {self.boty} pixels from the bottom."

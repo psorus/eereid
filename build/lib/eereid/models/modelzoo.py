@@ -18,11 +18,11 @@ class modelzoo(wrapmodel):
         super().__init__("modelzoo")
 
     def build_submodel(self,input_shape, mods):
-        add_layers=mods("add_layer_count",1)
+        add_layers=mods("add_layer_count",4)
         activation=mods("activation","relu")
         nodes=mods("nodes_per_layer",256)
         outputs=mods("output_size",100)
-        global_average_pooling=mods("global_average_pooling",True)
+        global_average_pooling=mods("global_average_pooling", False)
         pcb=mods("pcb", True)
         freeze=mods("freeze",self.freeze)
         input_layer = tf.keras.layers.Input(shape=input_shape)
@@ -38,14 +38,32 @@ class modelzoo(wrapmodel):
             x = Conv2D(256, 1)(x)
             print("shape after conv2d", x.shape)
 
-        x=Flatten()(x)
-        print("shape after flatten", x.shape)
+        if pcb:
+            # [B, H, W, C]
+            shape = base_model.output_shape
+            stripe_h = int(shape[1] / add_layers)
 
-        for i in range(add_layers):
-            x = Dense(nodes, activation=activation)(x)
-        
-        #predictions = Dense(outputs, activation='linear')(x)
-        predictions = Dense(outputs, activation='softmax')(x) #softmax instead of linear
+            local_feat_list = []
+            logits_list = []
+            print(stripe_h, x.shape)
+            for i in range(add_layers):
+                temp = x[:,i * stripe_h : (i+1)*stripe_h, :, :]
+                print(temp.shape)
+                local_feat = tf.nn.avg_pool2d(temp, stripe_h, shape[2], 'VALID')
+                print("local feat", local_feat.shape)
+                local_feat = Conv2D(256, 1)(local_feat)
+                local_feat = Flatten()(local_feat)
+                local_feat_list.append(local_feat)
+
+                logits = Dense(nodes,activation='softmax')(local_feat)
+                print("logits", logits.shape)
+                logits_list.append(logits)
+
+        predictions = tf.concat(logits_list, axis=-1)
+        print("pred", predictions.shape)
+
+        # predictions = Dense(outputs, activation='linear')(x)
+        # predictions = Dense(outputs, activation='softmax')(x) #softmax instead of linear
         
         if freeze:
             for layer in base_model.layers:
@@ -55,10 +73,3 @@ class modelzoo(wrapmodel):
 
     def explain(self):
         return f"Modelzoo loader gag, using the base model {self.zoomodel.__name__}." + ("Freezing the pretrained weights." if self.freeze else "")
-
-
-
-
-
-
-

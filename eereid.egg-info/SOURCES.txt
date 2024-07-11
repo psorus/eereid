@@ -71,6 +71,7 @@ eereid/prepros/__init__.py
 eereid/prepros/add_color.py
 eereid/prepros/apply_func.py
 eereid/prepros/blackwhite.py
+eereid/prepros/crop.py
 eereid/prepros/flips.py
 eereid/prepros/grapho.py
 eereid/prepros/prepro.py
