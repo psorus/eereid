@@ -59,10 +59,11 @@ class modelzoo(wrapmodel):
                 print("logits", logits.shape)
                 logits_list.append(logits)
 
-        predictions = tf.concat(logits_list, axis=-1)
-        print("pred", predictions.shape)
+            predictions = tf.concat(logits_list, axis=-1)
+            print("pred", predictions.shape)
 
-        # predictions = Dense(outputs, activation='linear')(x)
+        if not pcb:
+            predictions = Dense(outputs, activation='linear')(x)
         # predictions = Dense(outputs, activation='softmax')(x) #softmax instead of linear
         
         if freeze:
