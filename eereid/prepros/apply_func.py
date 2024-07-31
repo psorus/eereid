@@ -20,7 +20,7 @@ class apply_func(prepro):
 
     def apply(self, data, labels, eereid):
         if eereid is not None:self._apply_special(eereid)
-        data= np.array([self._apply_one(image) for image in tqdm(data)])
+        data= np.array([self._apply_one(image) for image in tqdm(data,desc="Applying function to data")])
         if eereid is not None:eereid.input_shape=data[0].shape
 
         return data, labels
