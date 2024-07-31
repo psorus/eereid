@@ -13,10 +13,6 @@ setup(
   download_url = 'https://github.com/psorus/eereid/archive/v_01.tar.gz',    
   keywords = ['Re-ID','Reidentification','Contrastive Learning','Metric Learning','Machine Learning','ML'],   
   install_requires=[            
-          #'tensorflow==2.11.*',
-          #'numpy',
-          #'scikit-learn',
-          #'tqdm',
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',      
@@ -31,3 +27,8 @@ setup(
     'Programming Language :: Python :: 3.10',
   ],
 )
+
+          #'tensorflow==2.11.*',
+          #'numpy',
+          #'scikit-learn',
+          #'tqdm',
