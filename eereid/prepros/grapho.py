@@ -35,8 +35,8 @@ class grapho(prepro):
 
         positions=[]
         subimages=[]
-        for i in range(image.shape[0]-self.subimagesize):
-            for j in range(image.shape[1]-self.subimagesize):
+        for i in range(0,image.shape[0]-self.subimagesize,self.subimagesize):
+            for j in range(0,image.shape[1]-self.subimagesize,self.subimagesize):
                 subimage=image[i:i+self.subimagesize,j:j+self.subimagesize]
                 subimages.append(subimage)
                 positions.append((i+self.subimagesize/2,j+self.subimagesize/2))
