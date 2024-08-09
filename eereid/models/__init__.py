@@ -9,3 +9,4 @@ from .simple_graph import simple_graph
 from .simple_graph import simple_graph as graph
 from .load_model import load_model
 from .modelzoo import modelzoo
+from .null import null
