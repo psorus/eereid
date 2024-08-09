@@ -187,7 +187,7 @@ class ghost():
         tasks=[prepro for prepro in self.prepro.values() if prepro.stage()=="general"]
         tasks.sort(key=lambda k:k.order())
         for prepro in tasks:
-            self._log(f"Applying preprocessing {task.ident()}",0)
+            self._log(f"Applying preprocessing {prepro.ident()}",0)
             x,y=prepro.apply(x,y,None)
         if labels is None:
             return x
