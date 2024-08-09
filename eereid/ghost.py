@@ -242,6 +242,29 @@ class ghost():
                 self._preprocess_train()
                 yield fold
                 fold+=1
+
+    def _crossval_data_loading_from_file(self):
+        #under construction. Not sure if needed
+        self._log("Starting crossvalidation data loading from files",1)
+        self.x,self.y=self.dataset.load_data(self.mods())
+        self.input_shape=list(self.dataset.input_shape())
+        self._log(f"Got input shape {self.input_shape}",1)
+        self._preprocess()
+        fold=0
+        if self.novelty is None:
+            self._log("Splitting data into training, query and gallery sets",1)
+            for self.tx,self.ty,self.qx,self.qy,self.gx,self.gy in crossvalidation(self.x,self.y,self.mods(),novelty=False):
+                self._log(f"Starting fold {fold}",1)
+                self._preprocess_train()
+                yield fold
+                fold+=1
+        else:
+            self._log("Splitting data into training, query, gallery and novelty sets",1)
+            for self.tx,self.ty,self.qx,self.qy,self.gx,self.gy,self.nx in crossvalidation(self.x,self.y,self.mods(),novelty=True):
+                self._log(f"Starting fold {fold}",1)
+                self._preprocess_train()
+                yield fold
+                fold+=1
         
     def _create_model(self):
         self._log("Building the model",1)

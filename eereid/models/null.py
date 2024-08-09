@@ -1,7 +1,7 @@
 from eereid.gag import gag
 from eereid.models.model import model
 
-class null(model):
+class nothing(model):
     def __init__(self):
         super().__init__("null")
         self.model=None
