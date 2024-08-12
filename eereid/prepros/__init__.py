@@ -7,6 +7,8 @@ from .prepro import prepro
 from .resize import resize
 from .rotations import rotations
 from .subsample import subsample
+from .smartsample import smartsample
+from .classsample import classsample
 from .grapho import grapho
 from .crop import crop
 from .normalize import normalize
