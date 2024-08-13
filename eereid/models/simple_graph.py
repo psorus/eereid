@@ -41,6 +41,7 @@ class simple_graph(model):
         outputs = mods("output_size", 100)
         hidden_dense=mods("hidden_dense", 3)
         hidden_dense_size=mods("hidden_dense_size", 256)
+        flatten=mods("graph_flatten", True)
 
         #input shape should be (nodes, nodes+features)
         nodes = input_shape[0]
@@ -55,7 +56,10 @@ class simple_graph(model):
         for i in range(layers_count):
             q = GCNConv(filters, activation=activation)([q, adjacency_matrix])
     
-        q = keras.layers.Flatten()(q)
+        if flatten:
+            q = keras.layers.Flatten()(q)
+        else:
+            q=K.mean(q,axis=1)
         for i in range(hidden_dense):
             q=keras.layers.Dense(hidden_dense_size, activation=activation)(q)
         q = keras.layers.Dense(outputs, activation="linear")(q)
