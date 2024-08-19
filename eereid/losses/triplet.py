@@ -17,7 +17,7 @@ class triplet(loss):
             anchor, positive, negative = y_pred[0], y_pred[1], y_pred[2]
             positive_dist = K.sum(K.square(anchor - positive), axis=-1)
             negative_dist = K.sum(K.square(anchor - negative), axis=-1)
-            return K.sum(K.maximum(positive_dist - negative_dist + self.margin, 0), axis=-1)
+            return K.mean(K.maximum(positive_dist - negative_dist + self.margin, 0), axis=-1)
 
         return func
 
