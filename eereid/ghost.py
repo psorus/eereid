@@ -5,6 +5,7 @@ from eereid.tools import datasplit, build_triplets, build_Nlets, rankN, crossval
 
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import backend as K
 
 from eereid.modifier.mods import mods
 
