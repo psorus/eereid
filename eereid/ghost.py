@@ -430,6 +430,7 @@ class ghost():
         self._log("Training the following model",1)
         self._log(self.explain(),1)
         self._direct_data_loading()
+        self._create_model()
         if self.mods().hasattr("pretrain"):
             self._pretrain_prediction()
         self._train_model()
