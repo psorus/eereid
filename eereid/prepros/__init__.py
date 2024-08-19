@@ -12,3 +12,5 @@ from .classsample import classsample
 from .grapho import grapho
 from .crop import crop
 from .normalize import normalize
+from .featurebagging import featurebagging
+from .trainsample import trainsample
