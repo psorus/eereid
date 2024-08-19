@@ -7,6 +7,7 @@ from .simple_dense import simple_dense
 from .simple_dense import simple_dense as dense
 from .simple_graph import simple_graph
 from .simple_graph import simple_graph as graph
+from .advanced_graph import advanced_graph
 from .load_model import load_model
 from .modelzoo import modelzoo
 from .null import nothing
