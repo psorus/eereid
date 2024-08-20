@@ -1,5 +1,12 @@
+import os.path as osp
 from distutils.core import setup
 from setuptools import find_packages
+
+def get_requirements(filename='requirements.txt'):
+    here = osp.dirname(osp.realpath(__file__))
+    with open(osp.join(here, filename), 'r') as f:
+        requires = [line.replace('\n', '') for line in f.readlines()]
+    return requires
 
 setup(
   name = 'eereid',         
@@ -12,8 +19,7 @@ setup(
   url = 'https://github.com/psorus/eereid',   
   download_url = 'https://github.com/psorus/eereid/archive/v_01.tar.gz',    
   keywords = ['Re-ID','Reidentification','Contrastive Learning','Metric Learning','Machine Learning','ML'],   
-  install_requires=[            
-      ],
+  install_requires=get_requirements(),
   classifiers=[
     'Development Status :: 3 - Alpha',      
     'Intended Audience :: Science/Research',      
