@@ -1,3 +1,4 @@
 eereid.egg-info/
 build/
+dist/
 .devcontainer/
