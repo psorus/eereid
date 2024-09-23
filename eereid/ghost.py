@@ -270,6 +270,11 @@ class ghost():
     def _create_model(self):
         self._log("Building the model",1)
         self.model.build(self.input_shape,self.loss.siamese_count(),self.mods())
+        stream=io.StringIO()
+        self.model.summay(print_fn=lambda x:stream.write(x+'\n'))
+        ms=stream.getvalue()
+        self._log("Model summary:",1)
+
     def _pretrain_prediction(self):
         pretrain_epochs=self.mods()("pretrain_epochs",1)
         pretrain_loss=self.mods()("pretrain_los","categorical_crossentropy")
