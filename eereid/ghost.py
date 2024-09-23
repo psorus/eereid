@@ -1,4 +1,5 @@
 import numpy as np
+import io
 import matplotlib.pyplot as plt
 
 from eereid.tools import datasplit, build_triplets, build_Nlets, rankN, crossvalidation, add_tags, various_tags
@@ -271,9 +272,9 @@ class ghost():
         self._log("Building the model",1)
         self.model.build(self.input_shape,self.loss.siamese_count(),self.mods())
         stream=io.StringIO()
-        self.model.summay(print_fn=lambda x:stream.write(x+'\n'))
-        ms=stream.getvalue()
-        self._log("Model summary:",1)
+        self.model.summary(print_fn=lambda x:stream.write(x+'\n'))
+        self._log("Model summary:\n"+stream.getvalue(),0)
+
 
     def _pretrain_prediction(self):
         pretrain_epochs=self.mods()("pretrain_epochs",1)
