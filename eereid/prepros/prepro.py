@@ -34,3 +34,6 @@ class prepro(gag):
 
     def explain(self):
         return "Generic preprocessing gag"
+
+    def apply_always(self):
+        return True

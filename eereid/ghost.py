@@ -1,6 +1,8 @@
 import numpy as np
 import io
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 
 from eereid.tools import datasplit, build_triplets, build_Nlets, rankN, crossvalidation, add_tags, various_tags
 
@@ -194,6 +196,19 @@ class ghost():
         if labels is None:
             return x
         return x,y
+    def apply_later_preprocessing(self,data, labels=None):
+        self._log("Starting preprocessing for the new data",0)
+        x,y=data,labels
+        if y is None:
+            y=np.zeros(len(x))
+        tasks=[prepro for prepro in self.prepro.values() if prepro.stage()=="general" and prepro.apply_always()]
+        tasks.sort(key=lambda k:k.order())
+        for prepro in tasks:
+            self._log(f"Applying preprocessing {prepro.ident()}",0)
+            x,y=prepro.apply(x,y,None)
+        if labels is None:
+            return x
+        return x,y
     def _preprocess_train(self):
         self._log("Starting training data preprocessing",1)
         tasks=[prepro for prepro in self.prepro.values() if prepro.stage()=="train"]
@@ -337,8 +352,9 @@ class ghost():
         self._log("Training the model",1)
         self.logs=self.model.fit(Nlets,labels,epochs=epochs,batch_size=batch_size,validation_split=validation_split,callbacks=callbacks,verbose=verbose,**kwargs)
         self._log("Training complete",1)
-        self._log("Training logs:",0)
-        self._log(str(self.logs.history),0)
+        if self.logs:
+            self._log("Training logs:",0)
+            self._log(str(self.logs.history),0)
         return self.logs
 
     def _embed(self,data):
@@ -454,7 +470,7 @@ class ghost():
     def embed(self,data):
         self._log("Embedding data",0)
         self.assert_trained()
-        data=self.apply_preprocessing(data)
+        data=self.apply_later_preprocessing(data)
         return self.model.embed(data)
 
     def clear_gallery(self):
@@ -466,7 +482,7 @@ class ghost():
     def add_to_gallery(self,data,labels):
         self._log(f"Adding {len(labels)} samples to the gallery",1)
         self.assert_trained()
-        data,labels=self.apply_preprocessing(data,labels)
+        data,labels=self.apply_later_preprocessing(data,labels)
         self.gemb=np.concatenate([self.gemb,self.embed(data)],axis=0)
         self.gx=np.concatenate([self.gx,data],axis=0)
         self.gy=np.concatenate([self.gy,labels],axis=0)
@@ -558,18 +574,47 @@ class ghost():
 
     def plot_loss(self,log=False):
         self._log("Plotting the loss",1)
-        assert self.logs is not None
+        assert self.logs is not None, "To plot the loss of a model, please train it first"
         h=self.logs.history
-        for key,y in h.items():
+        colors=["darkorchid","olivedrab","firebrick","royalblue","goldenrod","olivedrab","lightseagreen","darkorchid"]
+        rename={"loss":"Training","val_loss":"Validation"}
+        for i,(key,y) in enumerate(h.items()):
             x=np.arange(1,len(y)+1)
+            if key in rename:
+                key=rename[key]
 
-            plt.plot(x,y,label=key)
+            plt.plot(x,y,label=key,color=colors[i%len(colors)],linewidth=2)
+            if len(y)<100:
+                plt.plot(x,y,"o",color=colors[i%len(colors)],markersize=8)
+            plt.axvline(np.argmin(y)+1,color=colors[i%len(colors)],linestyle="--",alpha=0.5)
         plt.legend()
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
         if log:
             plt.yscale("log")
         plt.legend(frameon=True,framealpha=0.8)
+
+    def plot_match(self, sample, true_label=None, n=10):
+
+        embed=self.embed(np.array([sample]))
+        dist=self.distance.multi_distance(self.gemb,embed)
+        idx=np.argsort(dist)[:n]
+        fig,ax=plt.subplots(1,n+1,figsize=(n*2,2))
+        ax[0].imshow(sample.reshape(self.input_shape),cmap="gray")
+        ax[0].axis("off")
+        for i in range(n):
+            ax[i+1].imshow(self.gx[idx[i]].reshape(self.input_shape),cmap="gray")
+            ax[i+1].axis("off")
+            if true_label is not None:
+               # ax[i+1].set_title(f"True: {true_label}, Pred: {self.gy[idx[i]]}")
+                if true_label==self.gy[idx[i]]:
+                    color="limegreen"
+                else:
+                    color="red"
+                axc=ax[i+1]
+                pos = axc.get_position()
+                rect = patches.Rectangle((pos.x0, pos.y0), pos.width, pos.height, linewidth=5, edgecolor=color, facecolor='none')
+                fig.add_artist(rect)
 
 
     def __add__(self,other):
