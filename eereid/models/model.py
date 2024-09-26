@@ -18,11 +18,11 @@ class model(gag):
     def compile(self,loss,*args,**kwargs):
         return self.model.compile(*args,loss=loss,**kwargs)
 
-    def summary(self):
+    def summary(self,*args,**kwargs):
         print("submodel:")
-        self.submodel.summary()
+        self.submodel.summary(*args,**kwargs)
         print("model:")
-        self.model.summary()
+        self.model.summary(*args,**kwargs)
 
     def fit(self,triplets,labels,*args,**kwargs):
         ret= self.model.fit(triplets,labels,*args,**kwargs)

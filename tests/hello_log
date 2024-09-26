@@ -1,0 +1,121 @@
+2024-09-23 11:58:51: Evaluating the following model
+Ghost ReID experiment
+    Dataset:
+        MNIST data loader
+    Model:
+        Creating a simple convolutional neural network model.
+    Loss:
+        Extended triplet loss with margin of 1.0. The formula is relu(D(a,p)-loss_aggregator(D(a,n),D(p,n))+margin).
+    Distance:
+        Euclidean distance is a measure of distance between two vectors. It is calculated as the square root of the sum of the squared differences between the two vectors. The formula is: sqrt(sum((a-b)^2))
+    Preprocessings:
+        Reduces the fraction of samples used by factor 0.1. This is mostly useful for quickly debugging
+    Novelty Detection:
+        Novelty detection based on distance from the normal data. Using the same distance function as the reidentification model
+    Modifiers:
+        Modifier:    triplet_count: 100
+            crossval: False
+            log_file: hello_log
+2024-09-23 11:58:51: Starting basic data loading
+2024-09-23 11:58:51: Got input shape [28, 28]
+2024-09-23 11:58:51: Starting preprocessing
+2024-09-23 11:58:51: Applying preprocessing subsample
+2024-09-23 11:58:51: Splitting data into training, query, gallery and novelty sets
+2024-09-23 11:58:51: Starting training data preprocessing
+2024-09-23 11:58:51: Building the model
+2024-09-23 11:58:51: Model summary:
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 28, 28)]          0         
+                                                                 
+ tf.expand_dims (TFOpLambda)  (None, 28, 28, 1)        0         
+                                                                 
+ conv2d (Conv2D)             (None, 28, 28, 64)        640       
+                                                                 
+ conv2d_1 (Conv2D)           (None, 28, 28, 64)        36928     
+                                                                 
+ max_pooling2d (MaxPooling2D  (None, 14, 14, 64)       0         
+ )                                                               
+                                                                 
+ conv2d_2 (Conv2D)           (None, 14, 14, 64)        36928     
+                                                                 
+ conv2d_3 (Conv2D)           (None, 14, 14, 64)        36928     
+                                                                 
+ max_pooling2d_1 (MaxPooling  (None, 7, 7, 64)         0         
+ 2D)                                                             
+                                                                 
+ conv2d_4 (Conv2D)           (None, 7, 7, 64)          36928     
+                                                                 
+ conv2d_5 (Conv2D)           (None, 7, 7, 64)          36928     
+                                                                 
+ flatten (Flatten)           (None, 3136)              0         
+                                                                 
+ dense (Dense)               (None, 100)               313700    
+                                                                 
+=================================================================
+Total params: 498,980
+Trainable params: 498,980
+Non-trainable params: 0
+_________________________________________________________________
+Model: "model_1"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to                     
+==================================================================================================
+ input_2 (InputLayer)           [(None, 3, 28, 28)]  0           []                               
+                                                                                                  
+ tf.__operators__.getitem (Slic  (None, 28, 28)      0           ['input_2[0][0]']                
+ ingOpLambda)                                                                                     
+                                                                                                  
+ tf.__operators__.getitem_1 (Sl  (None, 28, 28)      0           ['input_2[0][0]']                
+ icingOpLambda)                                                                                   
+                                                                                                  
+ tf.__operators__.getitem_2 (Sl  (None, 28, 28)      0           ['input_2[0][0]']                
+ icingOpLambda)                                                                                   
+                                                                                                  
+ model (Functional)             (None, 100)          498980      ['tf.__operators__.getitem[0][0]'
+                                                                 , 'tf.__operators__.getitem_1[0][
+                                                                 0]',                             
+                                                                  'tf.__operators__.getitem_2[0][0
+                                                                 ]']                              
+                                                                                                  
+ tf.expand_dims_1 (TFOpLambda)  (1, None, 100)       0           ['model[0][0]']                  
+                                                                                                  
+ tf.expand_dims_2 (TFOpLambda)  (1, None, 100)       0           ['model[1][0]']                  
+                                                                                                  
+ tf.expand_dims_3 (TFOpLambda)  (1, None, 100)       0           ['model[2][0]']                  
+                                                                                                  
+ tf.concat (TFOpLambda)         (3, None, 100)       0           ['tf.expand_dims_1[0][0]',       
+                                                                  'tf.expand_dims_2[0][0]',       
+                                                                  'tf.expand_dims_3[0][0]']       
+                                                                                                  
+==================================================================================================
+Total params: 498,980
+Trainable params: 498,980
+Non-trainable params: 0
+__________________________________________________________________________________________________
+
+2024-09-23 11:58:51: Compiling the model
+2024-09-23 11:58:51: Building the training data
+2024-09-23 11:58:51: Training the model
+2024-09-23 11:58:58: Training complete
+2024-09-23 11:58:58: Training logs:
+2024-09-23 11:58:58: {'loss': [20.06085968017578, 5.745373725891113, 2.2667198181152344, 1.4787347316741943, 0.8147250413894653, 0.0, 1.3622138500213623, 1.6471164226531982, 0.0, 1.9019389152526855], 'val_loss': [6.359033107757568, 6.300940036773682, 7.098175048828125, 4.007501125335693, 0.931903064250946, 0.0, 0.0, 30.795543670654297, 44.053794860839844, 39.52851486206055]}
+2024-09-23 11:58:58: Starting the evaluation
+2024-09-23 11:58:58: Creating embeddings using the trained model
+2024-09-23 11:59:01: Calculating the accuracy
+2024-09-23 11:59:02: Accuracy calculated:
+2024-09-23 11:59:02: {
+  "rank-1": 0.9424184261036468,
+  "rank-2": 0.9788867562380038,
+  "rank-3": 0.9875239923224568,
+  "rank-5": 0.9932821497120922,
+  "rank-10": 0.9980806142034548,
+  "mAP": 0.6042201579374891
+}
+2024-09-23 11:59:02: Calculating the novelty detection accuracy
+2024-09-23 11:59:02: Creating the novelty model
+2024-09-23 11:59:02: Training the novelty model
+2024-09-23 11:59:02: Evaluating the novelty model
+2024-09-23 11:59:02: Novelty detection AUC calculated: 0.9380108477646704

@@ -36,3 +36,4 @@ class smartsample(prepro):
 
     def explain(self):
         return f"Reduces the fraction of samples used by factor {self.frac}. This is mostly useful for quickly debugging. In comparison to subsample, this method keeps the fraction of images taken per class constant."
+    def apply_always(self):return False
