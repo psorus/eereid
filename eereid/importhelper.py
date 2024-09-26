@@ -1,6 +1,3 @@
-
-
-
 class importhelper():
 
     def __init__(self, lib, job, install=None):
@@ -12,3 +9,5 @@ class importhelper():
     def __getattr__(self, name):
         raise ImportError(f"""Using the '{self.job}' module requires the '{self.lib}' library. Please install it by running: '{self.install}'""")
 
+    def __call__(self, *args, **kwds):
+        raise ImportError(f"""Using the '{self.job}' module requires the '{self.lib}' library. Please install it by running: '{self.install}'""")
