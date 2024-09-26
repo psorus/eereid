@@ -19,17 +19,21 @@ import eereid as ee
 from tqdm import tqdm
 
 class ghost():
-    def __init__(self,*tags,dataset=None, distance=None, loss=None, model=None, novelty=None, experiments=None,modifier=None,preproc=None,prepros=None,preprocessing=None, **kwargs):
-        #add kwargs 
-        self.dataset=ee.datasets.mnist()
-        self.distance=ee.distances.euclidean()
-        self.experiments={}
-        self.loss=ee.losses.triplet()
-        self.model=ee.models.conv()
-        self.modifier=mods()
-        self.novelty=None
+    def __init__(self,
+                 *tags,
+                 dataset=ee.datasets.mnist(), 
+                 distance=ee.distances.euclidean(), 
+                 loss=ee.losses.triplet(), 
+                 model=ee.models.conv(), 
+                 novelty=None, 
+                 experiments={},
+                 modifier=mods(),
+                 preproc=None,
+                 prepros=None,
+                 preprocessing=None, 
+                 **kwargs):
+        
         self.prepro={}
-
         self.logs=None
 
         for tag in tags:
