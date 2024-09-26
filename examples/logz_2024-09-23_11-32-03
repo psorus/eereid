@@ -1,0 +1,67 @@
+2024-09-23 11:32:03: Evaluating the following model
+Haunting (Ensemble ghost) experiment, build from 4 ghosts.
+    Dataset:
+        MNIST data loader
+    Distance:
+        Euclidean distance is a measure of distance between two vectors. It is calculated as the square root of the sum of the squared differences between the two vectors. The formula is: sqrt(sum((a-b)^2))
+    Submodel 1:
+        Ghost ReID experiment
+            Dataset:
+                MNIST data loader
+            Model:
+                Creating a simple graph neural network model.
+            Loss:
+                Triplet loss with margin of 1.0. The formula is relu(D(a,p)-D(a,n)+margin).
+            Distance:
+                Euclidean distance is a measure of distance between two vectors. It is calculated as the square root of the sum of the squared differences between the two vectors. The formula is: sqrt(sum((a-b)^2))
+            Preprocessings:
+                Converts an image into a graph, by searching for for significant parts. The resulting graph will have 50 nodes.
+                Reduces the fraction of samples used by factor 1. This is mostly useful for quickly debugging
+            Modifiers:
+                Modifier:    triplet_count: 10000
+    Submodel 2:
+        Ghost ReID experiment
+            Dataset:
+                MNIST data loader
+            Model:
+                Creating a simple convolutional neural network model.
+            Loss:
+                Triplet loss with margin of 1.0. The formula is relu(D(a,p)-D(a,n)+margin).
+            Distance:
+                Euclidean distance is a measure of distance between two vectors. It is calculated as the square root of the sum of the squared differences between the two vectors. The formula is: sqrt(sum((a-b)^2))
+            Preprocessings:
+                Reduces the fraction of samples used by factor 1. This is mostly useful for quickly debugging
+            Modifiers:
+                Modifier:    triplet_count: 10000
+    Submodel 3:
+        Ghost ReID experiment
+            Dataset:
+                MNIST data loader
+            Model:
+                Creating a simple convolutional neural network model.
+            Loss:
+                Triplet loss with margin of 1.0. The formula is relu(D(a,p)-D(a,n)+margin).
+            Distance:
+                Euclidean distance is a measure of distance between two vectors. It is calculated as the square root of the sum of the squared differences between the two vectors. The formula is: sqrt(sum((a-b)^2))
+            Preprocessings:
+                Applies a function to each subimage and stiches the result back into a new image. Uses subimages of 4 pixels in each direction with overlap of 0.5
+                Reduces the fraction of samples used by factor 1. This is mostly useful for quickly debugging
+            Modifiers:
+                Modifier:    triplet_count: 10000
+    Submodel 4:
+        Ghost ReID experiment
+            Dataset:
+                MNIST data loader
+            Model:
+                Creating a simple convolutional neural network model.
+            Loss:
+                Triplet loss with margin of 1.0. The formula is relu(D(a,p)-D(a,n)+margin).
+            Distance:
+                Euclidean distance is a measure of distance between two vectors. It is calculated as the square root of the sum of the squared differences between the two vectors. The formula is: sqrt(sum((a-b)^2))
+            Preprocessings:
+                Applies a function to each subimage and stiches the result back into a new image. Uses subimages of 4 pixels in each direction with overlap of 0.5
+                Reduces the fraction of samples used by factor 1. This is mostly useful for quickly debugging
+            Modifiers:
+                Modifier:    triplet_count: 10000
+2024-09-23 11:32:03: Starting ensemble type data loading
+2024-09-23 11:32:03: Starting preprocessing

@@ -23,7 +23,8 @@ class simple_conv(wrapmodel):
         inp=keras.layers.Input(shape=input_shape)
         q=inp
         if len(input_shape)==2:
-            q=K.expand_dims(q,axis=-1)
+            #q=K.expand_dims(q,axis=-1)
+            q=keras.layers.Reshape(list(q.shape[1:])+[1])(q)
 
         for i in range(layers):
             for j in range(convcount):

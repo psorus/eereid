@@ -333,7 +333,10 @@ class ghost():
         self._log("Compiling the model",1)
         self.model.compile(loss=loss,optimizer=optimizer)
 
-        K.set_value(self.model.model.optimizer.learning_rate,learning_rate)
+        #deprecated
+        #K.set_value(self.model.model.optimizer.learning_rate,learning_rate)
+        #replacement
+        self.model.model.optimizer.learning_rate.assign(learning_rate)
 
         self._log("Building the training data",1)
         Nlets, labels=build_Nlets(self.tx,self.ty,self.loss.Nlet_string(),self.mods())
