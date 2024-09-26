@@ -2,6 +2,7 @@ import numpy as np
 import io
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import os
 
 
 from eereid.tools import datasplit, build_triplets, build_Nlets, rankN, crossvalidation, add_tags, various_tags
