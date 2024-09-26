@@ -18,17 +18,13 @@ class wrapmodel(model):
         self.build_submodel(input_shape,mods)
 
         inp2=keras.layers.Input(shape=[siamese_count]+list(input_shape))
+        
         samples=[inp2[:,i] for i in range(siamese_count)]
-        samples=[self.submodel(sample) for sample in samples]
-        samples=[K.expand_dims(sample,axis=0) for sample in samples]
-        outp=K.concatenate(samples,axis=0)
+        samples=[self.submodel(sample) for sample in samples]        
+        samples = [keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=0))(sample) for sample in samples]
+        outp = keras.layers.Concatenate(axis=0)(samples)
+        
         self.model=keras.models.Model(inputs=inp2,outputs=outp)
 
     def explain(self):
         return "Inheritable generic class creating siamese neural network wrapper"
-
-
-
-
-
-
