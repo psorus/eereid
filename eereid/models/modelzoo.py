@@ -63,6 +63,7 @@ class modelzoo(wrapmodel):
             #print("pred", predictions.shape)
 
         if not pcb:
+            x=Flatten()(x)
             predictions = Dense(outputs, activation='linear')(x)
         # predictions = Dense(outputs, activation='softmax')(x) #softmax instead of linear
         
