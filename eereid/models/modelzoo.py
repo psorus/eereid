@@ -23,7 +23,7 @@ class modelzoo(wrapmodel):
         nodes=mods("nodes_per_layer",256)
         outputs=mods("output_size",100)
         global_average_pooling=mods("global_average_pooling", False)
-        pcb=mods("pcb", True)
+        pcb=mods("pcb", False)
         freeze=mods("freeze",self.freeze)
         input_layer = tf.keras.layers.Input(shape=input_shape)
         base_model = self.zoomodel(*self.args, include_top=False, **self.kwargs, input_tensor=input_layer)
@@ -45,22 +45,22 @@ class modelzoo(wrapmodel):
 
             local_feat_list = []
             logits_list = []
-            print(stripe_h, x.shape)
+            #print(stripe_h, x.shape)
             for i in range(add_layers):
                 temp = x[:,i * stripe_h : (i+1)*stripe_h, :, :]
-                print(temp.shape)
+                #print(temp.shape)
                 local_feat = tf.nn.avg_pool2d(temp, stripe_h, shape[2], 'VALID')
-                print("local feat", local_feat.shape)
+                #print("local feat", local_feat.shape)
                 local_feat = Conv2D(256, 1)(local_feat)
                 local_feat = Flatten()(local_feat)
                 local_feat_list.append(local_feat)
 
                 logits = Dense(nodes,activation='softmax')(local_feat)
-                print("logits", logits.shape)
+                #print("logits", logits.shape)
                 logits_list.append(logits)
 
             predictions = tf.concat(logits_list, axis=-1)
-            print("pred", predictions.shape)
+            #print("pred", predictions.shape)
 
         if not pcb:
             predictions = Dense(outputs, activation='linear')(x)
