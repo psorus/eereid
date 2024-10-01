@@ -601,6 +601,8 @@ class ghost():
 
         if type(sample) is int:
             sample=self.qx[sample]
+            if true_label is None:
+                true_label=self.qy[sample]
 
         embed=self.embed(np.array([sample]))
         dist=self.distance.multi_distance(self.gemb,embed)
