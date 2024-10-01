@@ -631,7 +631,7 @@ class ghost():
         image=np.expand_dims(image,0)
         def find_last_conv_layer_name(model):
             for layer in reversed(model.layers):
-                if len(layer.output_shape) == 4:
+                if hasattr(layer,"output_shape") and len(layer.output_shape) == 4:
                     return layer.name
             raise ValueError("Could not find the last convolutional layer.")
         # create a model that maps the input image to the activations
