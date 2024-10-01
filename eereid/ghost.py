@@ -600,9 +600,9 @@ class ghost():
     def plot_match(self, sample, true_label=None, n=10):
 
         if type(sample) is int:
-            sample=self.qx[sample]
+            sample,sample0=self.qx[sample],sample
             if true_label is None:
-                true_label=self.qy[sample]
+                true_label=self.qy[sample0]
 
         embed=self.embed(np.array([sample]))
         dist=self.distance.multi_distance(self.gemb,embed)
@@ -624,7 +624,7 @@ class ghost():
                 rect = patches.Rectangle((pos.x0, pos.y0), pos.width, pos.height, linewidth=5, edgecolor=color, facecolor='none')
                 fig.add_artist(rect)
 
-    def plot_activation_heatmap(self,image):
+    def plot_activation_heatmap(self,image,overlay=0.5):
         model=self.model.submodel
         if type(image) is int:
             image=self.qx[image]
@@ -653,8 +653,13 @@ class ghost():
         heatmap = heatmap / tf.math.reduce_max(heatmap)  # Normalize               
 
         htm=heatmap.numpy()
-        plt.imshow(image[0],cmap="gray") 
-        plt.imshow(htm,alpha=0.4,cmap="hot", extent=[0,len(image[0]),0,len(image[0][0])])
+        image=image[0]
+        image=image[::-1]
+        while len(image.shape)>2:
+            image=np.mean(image,axis=-1)
+
+        plt.imshow(image,cmap="gray") 
+        plt.imshow(htm,alpha=overlay,cmap="hot", extent=[0,len(image[0]),0,len(image)])
 
 
 

@@ -24,19 +24,20 @@ class modelzoo(wrapmodel):
         outputs=mods("output_size",100)
         global_average_pooling=mods("global_average_pooling", False)
         pcb=mods("pcb", False)
+        #print("!",pcb)
         freeze=mods("freeze",self.freeze)
         input_layer = tf.keras.layers.Input(shape=input_shape)
         base_model = self.zoomodel(*self.args, include_top=False, **self.kwargs, input_tensor=input_layer)
 
         x = base_model.output
         y = base_model.output_shape[1:3]
-        print("shape pre global_", y)
-        print("shape pre global", x.shape)
+        #print("shape pre global_", y)
+        #print("shape pre global", x.shape)
         if global_average_pooling:
             x = AveragePooling2D(y)(x)
-            print("shape after global pooling", x.shape)
+            #print("shape after global pooling", x.shape)
             x = Conv2D(256, 1)(x)
-            print("shape after conv2d", x.shape)
+            #print("shape after conv2d", x.shape)
 
         if pcb:
             # [B, H, W, C]
