@@ -609,9 +609,11 @@ class ghost():
         idx=np.argsort(dist)[:n]
         fig,ax=plt.subplots(1,n+1,figsize=(n*2,2))
         ax[0].imshow(sample.reshape(self.input_shape),cmap="gray")
+        ax[0].title.set_text("ID:"+str(true_label))
         ax[0].axis("off")
         for i in range(n):
             ax[i+1].imshow(self.gx[idx[i]].reshape(self.input_shape),cmap="gray")
+            ax[i+1].title.set_text("ID:"+str(self.gy[idx[i]]))
             ax[i+1].axis("off")
             if true_label is not None:
                # ax[i+1].set_title(f"True: {true_label}, Pred: {self.gy[idx[i]]}")
