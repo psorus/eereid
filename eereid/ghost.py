@@ -661,7 +661,7 @@ class ghost():
             image=np.mean(image,axis=-1)
 
         plt.imshow(image,cmap="gray") 
-        plt.imshow(htm,alpha=overlay,cmap="hot", extent=[0,len(image[0]),0,len(image)])
+        plt.imshow(htm,alpha=overlay,cmap="jet", extent=[0,len(image[0]),0,len(image)])
 
 
 
