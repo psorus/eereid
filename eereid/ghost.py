@@ -654,7 +654,9 @@ class ghost():
         activation_map = tf.maximum(activation_map, 0)  # Ensure non-negative values
         heatmap = activation_map[0] 
         heatmap = heatmap / tf.math.reduce_max(heatmap)  # Normalize               
-
+        # Scale heatmap
+        heatmap = tf.image.resize(heatmap, (image.shape[1], image.shape[2]),method='bilinear')
+        
         htm=heatmap.numpy()
         image=image[0]
         image=image[::-1]
