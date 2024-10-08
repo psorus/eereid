@@ -655,7 +655,9 @@ class ghost():
         heatmap = activation_map[0] 
         heatmap = heatmap / tf.math.reduce_max(heatmap)  # Normalize               
         # Scale heatmap
+        heatmap = tf.expand_dims(heatmap, axis=-1)  # Now it has shape [height, width, 1]
         heatmap = tf.image.resize(heatmap, (image.shape[1], image.shape[2]),method='bilinear')
+        heatmap = tf.squeeze(heatmap, axis=-1)  # Back to shape [height, width]
         
         htm=heatmap.numpy()
         image=image[0]
